@@ -1,40 +1,37 @@
 # Tutorial 1: 序列化 Serialization
 
-[src](http://django-rest-framework.org/tutorial/1-serialization.html)
+`新的教學好像改了很多東西，201606更新`
 
-##1. 设置一个新的环境
+## 1. 設置一個新的環境
 
-在我们开始之前， 我们首先使用[virtualenv][virtualenv]要创建一个新的虚拟环境，以使我们的配置和我们的其他项目配置彻底分开。
-
+在我們開始之前， 我們首先使用virtualenv要創建一個新的虛擬環境，以使我們的配置和我們的其他項目配置徹底分開。
 
     $mkdir ~/env
     $virtualenv  ~/env/tutorial
     $source ~/env/tutorial/bin/avtivate
 
-现在我们处在一个虚拟的环境中，开始安装我们的依赖包
+現在我們處在一個虛擬的環境中，開始安裝我們的依賴包
 
     $pip install django
     $pip install djangorestframework
-    $pip install pygments   ////使用这个包，做代码高亮显示
+    $pip install pygments   ////使用這個包，做代碼高亮顯示
 
-需要退出虚拟环境时，运行`deactivate`。更多信息，[virtualenv document][virtualenv_doc]
+需要退出虛擬環境時，運行deactivate。更多信息，virtualenv document
 
-[virtualenv]: http://www.virtualenv.org/en/latest/index.html
-[virtualenv_doc]: http://www.virtualenv.org/en/latest/index.html
+## 2. 開始
 
-##2. 开始
-
-环境准备好只好，我们开始创建我们的项目
+環境準備好只好，我們開始創建我們的項目
 
     $ cd ~
     $ django-admin.py startproject tutorial
     $ cd tutorial
 
-项目创建好后，我们再创建一个简单的app
+項目創建好後，我們再創建一個簡單的app
 
     $python manage.py startapp snippets
 
-我们使用`sqlite3`来运行我们的项目tutorial，编辑`tutorial/settings.py`, 将数据库的默认引擎`engine`改为`sqlite3`, 数据库的名字`NAME`改为`tmp.db`
+我們使用sqlite3來運行我們的項目tutorial，編輯tutorial/settings.py,
+將資料庫的默認引擎engine改為sqlite3, 資料庫的名字NAME改為tmp.db
 
     DATABASES = {
         'default': {
@@ -47,32 +44,32 @@
         }
     }
 
-同时更改`settings.py`文件中的`INSTALLD_APPS`,添加我们的APP `snippets`和`rest_framework`
+同時更改settings.py文件中的INSTALLD_APPS,添加我們的APP snippets和rest_framework
 
     INSTALLED_APPS = (
         ...
         'rest_framework',
-        'snippets',
+        'snippets.apps.SnippetsConfig',
     )
 
-在`tutorial/urls.py`中，将snippets app的url包含进来
+在tutorial/urls.py中，將snippets app的url包含進來 `這裡被移到後面去了`
 
     urlpatterns = patterns('',
         url(r'^', include('snippets.urls')),
     )
 
-##3. 创建Model
+## 3. 創建Model
 
-这里我们创建一个简单的`snippets` model，目的是用来存储代码片段。
+這裡我們創建一個簡單的snippets model，目的是用來存儲代碼片段。
 
     from django.db import models
     from pygments.lexers import get_all_lexers
     from pygments.styles import get_all_styles
-    
+
     LEXERS = [item for item in get_all_lexers() if item[1]]
     LANGUAGE_CHOICES = sorted([(item[1][0], item[0]) for item in LEXERS])
     STYLE_CHOICES = sorted((item, item) for item in get_all_styles())
-    
+
     class Snippet(models.Model):
         created = models.DateTimeField(auto_now_add=True)
         title = models.CharField(max_length=100, default='')
@@ -82,94 +79,107 @@
                                     default='python',
                                     max_length=100)
         style = models.CharField(choices=STYLE_CHOICES,
-                                 default='friendly',
-                                 max_length=100)
-    
+                                default='friendly',
+                                max_length=100)
+
         class Meta:
             ordering = ('created',)
 
-完成model时，记得sync下数据库
+完成model時，記得sync下資料庫
 
-    python manage.py syncdb
+    python manage.py makemigrations snippets
+    python manage.py migrate
 
-##4. 创建序列化类
+## 4. 創建序列化類
 
-我们要使用我们的web api，要做的第一件事就是序列化和反序列化， 以便snippets实例能转换为可表述的内容，例如`json`. 我们声明一个可有效工作的串行器serializer。在`snippets`目录下面，该串行器与django 的表单形式很类似。创建一个`serializers.py` ，并将下面内容拷贝到文件中。
+我們要使用我們的web api，要做的第一件事就是提供snippets實例序列化和反序列化的方法， 以使snippets實例能轉換為可表述的內容，例如json.
+我們宣告一個串行器serializer，該串行器與django 的表單形式很類似。在snippets目錄下面，創建一個serializers.py ，並將下面內容拷貝到文件中。
 
-    from django.forms import widgets
     from rest_framework import serializers
-    from snippets.models import Snippet
-    
+    from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+
     class SnippetSerializer(serializers.Serializer):
-        pk = serializers.Field()  # Note: `Field` is an untyped read-only field.
+        pk = serializers.IntegerField(read_only=True)  
         title = serializers.CharField(required=False,
-                                      max_length=100)
-        code = serializers.CharField(widget=widgets.Textarea,
-                                     max_length=100000)
+                                    allow_blank=True,
+                                    max_length=100)
+        code = serializers.CharField(style={'base_template': 'textarea.html'})                                    
         linenos = serializers.BooleanField(required=False)
-        language = serializers.ChoiceField(choices=models.LANGUAGE_CHOICES,
-                                           default='python')
-        style = serializers.ChoiceField(choices=models.STYLE_CHOICES,
+        language = serializers.ChoiceField(choices=LANGUAGE_CHOICES,
+                                        default='python')
+        style = serializers.ChoiceField(choices=STYLE_CHOICES,
                                         default='friendly')
-    
-        def restore_object(self, attrs, instance=None):
+
+        def create(self, validated_data):
             """
-            Create or update a new snippet instance.
+            Create or return a new 'Snippet' instance, given the validated data.
             """
-            if instance:
-                # Update existing instance
-                instance.title = attrs['title']
-                instance.code = attrs['code']
-                instance.linenos = attrs['linenos']
-                instance.language = attrs['language']
-                instance.style = attrs['style']
-                return instance
-    
-            # Create new instance
-            return Snippet(**attrs)
+            return Snippet.objects.create(**validated_data)
+        def update(self, instance, validated_data):
+            """
+            update and return an existing `Snippet` instance, given the validated data.
+            """
+            instance.title = validated_data.get('title', instance.title)
+            instance.code = validated_data.get('code', instance.code)
+            instance.linenos = validated_data.get('linenos', instance.linenos)
+            instance.language = validated_data.get('language', instance.language)
+            instance.style = validated_data.get('style', instance.style)
+            instance.save()
+            return instance
 
-该序列化类的前面部分，定义了要序列化和反序列化的类型，`restore_object` 方法定义了如何通过反序列化数据，生成正确的对象实例。
+            
+            
+該序列化類的前面部分，定義了要序列化和反序列化的欄位(字段)(所以都是serializaers.什麼什麼)。
+當呼叫`serializer.save()`,`create()`和`update()` 方法定義了如何通過反序列化數據，生成或修改為正確的物件實例(所以都是validated_data.get(屬性)，然後instance.save()，最後返回instance)。
 
-Notice that we can also use various attributes that would typically be used on form fields, such as `widget=widgets.Textarea`. These can be used to control how the serializer should render when displayed as an HTML form. This is particularly useful for controlling how the browsable API should be displayed, as we'll see later in the tutorial.
+一個序列化類與Django Form 類十分相似，且包含了相似的確效旗標在各個欄位上，比如`required`, `max_length`, `default`。
 
-我们也可以使用`ModelSerializer`来快速生成，后面我们将节省如何使用它。
+在某些情況下，欄位旗標也可以用來控制serializer 如何被顯示。比如繪出為HTML時，上述的`{'base_template': 'textarea.html'}` 是等於Django Form class的 `widget=widgets.Textarea`。
+這對於控制`browsable API`如何被顯示十分有用，我們將在稍後的教學中看到。
 
-##5. 使用 Serializers
+我們也可以使用ModelSerializer來快速生成，後面我們將看到如何使用它。
 
-在我们使用我们定义的SnippetsSerializers之前，我们先熟悉下Snippets. 
+## 5. 使用 Serializers
+
+在我們使用我們定義的新的Serializers之前，我們先到Django shell.
 
     $python manage.py shell
 
-进入shell终端后，输入以下代码：
+進入shell終端後，輸入以下代碼：
 
     from snippets.models import Snippet
     from snippets.serializers import SnippetSerializer
     from rest_framework.renderers import JSONRenderer
     from rest_framework.parsers import JSONParser
-    
+
     snippet = Snippet(code='print "hello, world"\n')
     snippet.save()
 
-我们现在获得了一个Snippets的实例，现在我们对他进行以下序列化
+我們現在獲得了一個Snippets的實例可以利用，現在我們對他進行以下序列化
 
     serializer = SnippetSerializer(snippet)
     serializer.data
     # {'pk': 1, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}
+    # type(serializer.data)
+    # rest_framework.utils.serializer_helpers.ReturnDict
 
-这时，我们将该实例转成了python原生的数据类型。下面我们将该数据转换成`json`格式，以完成序列化：
+
+這時，我們將該實例轉成了python原生的數據類型。下面我們將該數據轉換成json格式，以完成序列化：
 
     content = JSONRenderer().render(serializer.data)
     content
     # '{"pk": 1, "title": "", "code": "print \\"hello, world\\"\\n", "linenos": false, "language": "python", "style": "friendly"}'
+    # type(content)
+    # bytes
 
-反序列化也很简单，首先我们要将一个输入流（content），转换成python的原生数据类型
+反序列化也很簡單，首先我們要將一個輸入流（content），轉換成python的原生數據類型 `這裡可能可以做一些修改，使用json.loads(content.decodez())，可返回python 的dict資料類型`
 
     import StringIO
-    
+
     stream = StringIO.StringIO(content)
     data = JSONParser().parse(stream)
 
-然后我们将该原生数据类型，转换成对象实例
+然後我們將該原生數據類型，轉換成物件實例
 
     serializer = SnippetSerializer(data=data)
     serializer.is_valid()
@@ -177,34 +187,62 @@ Notice that we can also use various attributes that would typically be used on f
     serializer.object
     # <Snippet: Snippet object>
 
-注意这些API和django表单的相似处。这些相似点， 在我们讲述在view中使用serializers时将更加明显。
+注意這些API和django表單的相似處。這些相似點， 在我們講述在view中使用serializers時將更加明顯。
 
-We can also serialize querysets instead of model instances. To do so we simply add a `many=True` flag to the serializer arguments.
+We can also serialize querysets instead of model instances. To do so we simply add a many=True flag to the serializer arguments.
 
     serializer = SnippetSerializer(Snippet.objects.all(), many=True)
     serializer.data
-    # [{'pk': 1, 'title': u'', 'code': u'foo = "bar"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}, {'pk': 2, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}]
 
-##6. 使用 ModelSerializers
+```sh    
+    ReturnDict([('pk', 3),
+            ('title', ''),
+            ('code', 'print("hello,world"\n'),
+            ('linenos', False),
+            ('language', 'python'),
+            ('style', 'friendly')])
+    #一些其他的例子
+    
+    
+```
+## 6. 使用 ModelSerializers
 
-`SnippetSerializer`使用了许多和`Snippet`中相同的代码。如果我们能把这部分代码去掉，看上去将更佳简洁。
+SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能把這部分代碼去掉，看上去將更佳簡潔。
 
-类似与django提供`Form`类和`ModelForm`类，Rest Framework也包含了`Serializer` 类和 `ModelSerializer`类。
+類似與django提供`Form`類和`ModelForm`類，Rest Framework也包含了`Serializer` 類和 `ModelSerializer`類。
 
-打开`snippets/serializers.py` ,修改`SnippetSerializer`类：
+打開snippets/serializers.py ,修改SnippetSerializer類：
 
     class SnippetSerializer(serializers.ModelSerializer):
         class Meta:
             model = Snippet
             fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
 
-##7. 通过Serializer编写Django View
+一個serializers的良好特性是你可以探索在serializer實例中所有的欄位，藉由印出其表現型，打開Django shell，試著依下面進行。
 
-让我们来看一下，如何通过我们创建的serializer类编写django view。这里我们不使用rest framework的其他特性，仅编写正常的django view。
+    from snippets.serializers import SnippetSerializer
+    serializer = SnippetSerializer()
+    print(repr(serializer))
+    # SnippetSerializer():
+    #    id = IntegerField(label='ID', read_only=True)
+    #    title = CharField(allow_blank=True, max_length=100, required=False)
+    #    code = CharField(style={'base_template': 'textarea.html'})
+    #    linenos = BooleanField(required=False)
+    #    language = ChoiceField(choices=[('Clipper', 'FoxPro'), ('Cucumber', 'Gherkin'), ('RobotFramework', 'RobotFramework'), ('abap', 'ABAP'), ('ada', 'Ada')...
+    #    style = ChoiceField(choices=[('autumn', 'autumn'), ('borland', 'borland'), ('bw', 'bw'), ('colorful', 'colorful')...
 
-我们创建一个HttpResponse 子类，这样我们可以将我们返回的任何数据转换成`json`。
+重要請記得，`ModelSerializer`並沒有做什麼魔法，它們只是簡單的創造出一個serializer 類別
 
-在`snippet/views.py`中添加以下内容：
+    * An automatically determined set of fields.
+    * Simple default implementations for the create() and update() methods.
+
+## 7. 通過Serializer編寫Django View
+
+讓我們來看一下，如何通過我們創建的serializer類編寫API view。這裡我們不使用rest framework的其他特性，僅編寫正常的django view。
+
+我們創建一個HttpResponse 子類，這樣我們可以將我們返回的任何數據轉換成json。
+
+在snippet/views.py中添加以下內容：
 
     from django.http import HttpResponse
     from django.views.decorators.csrf import csrf_exempt
@@ -212,7 +250,7 @@ We can also serialize querysets instead of model instances. To do so we simply a
     from rest_framework.parsers import JSONParser
     from snippets.models import Snippet
     from snippets.serializers import SnippetSerializer
-    
+
     class JSONResponse(HttpResponse):
         """
         An HttpResponse that renders it's content into JSON.
@@ -222,7 +260,7 @@ We can also serialize querysets instead of model instances. To do so we simply a
             kwargs['content_type'] = 'application/json'
             super(JSONResponse, self).__init__(content, **kwargs)
 
-我们API的目的是，可以通过view来列举全部的Snippet的内容，或者创建一个新的snippet
+我們API的目的是，可以通過view來列舉全部的Snippet的內容，或者創建一個新的snippet
 
     @csrf_exempt
     def snippet_list(request):
@@ -233,7 +271,7 @@ We can also serialize querysets instead of model instances. To do so we simply a
             snippets = Snippet.objects.all()
             serializer = SnippetSerializer(snippets)
             return JSONResponse(serializer.data)
-    
+
         elif request.method == 'POST':
             data = JSONParser().parse(request)
             serializer = SnippetSerializer(data=data)
@@ -243,12 +281,10 @@ We can also serialize querysets instead of model instances. To do so we simply a
             else:
                 return JSONResponse(serializer.errors, status=400)
 
-注意，因为我们要通过client向该view post一个请求，所以我们要将该view 标注为`csrf_exempt`, 以说明不是一个CSRF事件。
+注意，因為我們要能夠自client向該view 丟一個`Post`請求，所以我們要將該view 標註為csrf_exempt, 以說明不是一個CSRF事件。
+這並不是一個正常你想要做的事，且**REST framework** view事實上使用一個比csrf token更靈敏的行為，但我們現在就是要這麼做。
 
-Note that because we want to be able to POST to this view from clients that won't have a CSRF token we need to mark the view as `csrf_exempt`. This isn't something that you'd normally want to do, and REST framework views actually use more sensible behavior than this, but it'll do for our purposes right now.
-
-我们也需要一个view来操作一个单独的Snippet，以便能更新／删除该对象。
-
+我們也需要一個view來操作一個單獨的Snippet，以便能取回/更新/刪除該sinppet物件。
 
     @csrf_exempt
     def snippet_detail(request, pk):
@@ -259,11 +295,11 @@ Note that because we want to be able to POST to this view from clients that won'
             snippet = Snippet.objects.get(pk=pk)
         except Snippet.DoesNotExist:
             return HttpResponse(status=404)
-    
+
         if request.method == 'GET':
             serializer = SnippetSerializer(snippet)
             return JSONResponse(serializer.data)
-    
+
         elif request.method == 'PUT':
             data = JSONParser().parse(request)
             serializer = SnippetSerializer(snippet, data=data)
@@ -272,48 +308,88 @@ Note that because we want to be able to POST to this view from clients that won'
                 return JSONResponse(serializer.data)
             else:
                 return JSONResponse(serializer.errors, status=400)
-    
+
         elif request.method == 'DELETE':
             snippet.delete()
             return HttpResponse(status=204)
 
-将views.py保存，在Snippets目录下面创建`urls.py`,添加以下内容：
+將views.py保存，在Snippets目錄下面創建urls.py,添加以下內容：
 
     urlpatterns = patterns('snippets.views',
         url(r'^snippets/$', 'snippet_list'),
         url(r'^snippets/(?P<pk>[0-9]+)/$', 'snippet_detail'),
     )
+We also need to wire up the root urlconf, in the tutorial/urls.py file, to include our snippet app's URLs.
 
-注意我们有些边缘事件没有处理，服务器可能会抛出500异常。
+    from django.conf.urls import url, include
+
+    urlpatterns = [
+        url(r'^', include('snippets.urls')),
+    ]
+注意我們有些邊緣事件沒有處理，服務器可能會拋出500異常。
 
 It's worth noting that there are a couple of edge cases we're not dealing with properly at the moment. If we send malformed json, or if a request is made with a method that the view doesn't handle, then we'll end up with a 500 "server error" response. Still, this'll do for now.
 
-##8. 测试
+## 8. 測試
 
-现在我们启动server来测试我们的Snippet。
+現在我們啟動server來測試我們的Snippet。
 
-在python mange.py shell终端下执行（如果前面进入还没有退出）
+在python mange.py shell終端下執行（如果前面進入還沒有退出）
 
-  quit()
+    quit()
 
-执行下面的命令， 运行我们的server：
+執行下面的命令， 運行我們的server：
 
     python manage.py runserver
 
     Validating models...
 
     0 errors found
-    Django version 1.4.3, using settings 'tutorial.settings'
+    Django version 1.8.3, using settings 'tutorial.settings'
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
-新开一个terminal来测试我们的server
+新開一個terminal來測試我們的server,來測試我們的server
+我們可以用curl或httpie來測試我們的API.httpie 是一個使用者友善的http client，由python寫成，讓我安裝它
 
-序列化：
+    pip install httpie
 
-    curl http://127.0.0.1:8000/snippets/
-    >>[{"id": 1, "title": "", "code": "print \"hello, world\"\n", "linenos": false, "language": "python", "style": "friendly"}]
-    
-    curl http://127.0.0.1:8000/snippets/1/
-    >>{"id": 1, "title": "", "code": "print \"hello, world\"\n", "linenos": false, "language": "python", "style": "friendly"}
+最後我們可得一個所有的snippets物件的清單
+    http http://127.0.0.1:8000/snippets/
 
+    HTTP/1.1 200 OK
+    ...
+    [
+        {
+            "id": 1,
+            "title": "",
+            "code": "foo = \"bar\"\n",
+            "linenos": false,
+            "language": "python",
+            "style": "friendly"
+        },
+        {
+            "id": 2,
+            "title": "",
+            "code": "print \"hello, world\"\n",
+            "linenos": false,
+            "language": "python",
+            "style": "friendly"
+        }
+    ]
+或者由其id取得特定的snippet物件。
+    http http://127.0.0.1:8000/snippets/2/
+
+    HTTP/1.1 200 OK
+    ...
+    {
+        "id": 2,
+        "title": "",
+        "code": "print \"hello, world\"\n",
+        "linenos": false,
+        "language": "python",
+        "style": "friendly"
+    }
+
+## Where are we now
+我們目前還可以，我們已經有一個序列化API，有點像Django's Forms API，和一些Django views。我們的API此時無法做任何特別的動作，除了提供`json`回應，也需要錯誤處理機制，但這已經是一個有功能的API。

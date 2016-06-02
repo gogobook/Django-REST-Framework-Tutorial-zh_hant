@@ -2,48 +2,48 @@
 
 [src](http://django-rest-framework.org/tutorial/2-requests-and-responses.html) 
 
-从本节我们开始真正接触rest framework的核心部分。首先我们学习一下一些必备知识。
+從本節我們開始真正接觸rest framework的核心部分。首先我們學習一下一些必備知識。
 
-##1. Request Object  ——Request对象
+## 1. Request Object ——Request物件
 
-rest framework 引入了一个继承自`HttpRequest`的`Request`对象，该对象提供了对请求的更灵活解析。`request`对象的核心部分是`request.DATA`属性，类似于`request.POST`, 但在使用WEB API时，`request.DATA`更有效。
+rest framework 引入了一個繼承自HttpRequest的Request物件，該物件提供了對requests的更靈活解析。request物件的核心部分是request.data屬性，類似於request.POST, 但在使用WEB API時，request.DATA更有效。
 
-   request.POST  # Only handles form data.  Only works for 'POST' method.
-   request.DATA  # Handles arbitrary data.  Works any HTTP request with content.
+    request.POST # Only handles form data. Only works for 'POST' method. 
+    request.data # Handles arbitrary data. Works any HTTP request with content.
 
-##2. Response Object ——Response对象
+## 2. Response Object ——Response物件
 
-rest framework引入了一个`Response` 对象，它继承自`TemplateResponse`对象。它获得未渲染的内容并通过内容协商content negotiation 来决定正确的content type返回给client。
+rest framework引入了一個Response 物件，它是TemplateResponse的類型。它獲得未渲染的內容並通過內容協商content negotiation 來決定正確的content type返回給client。
 
     return Response(data)  # Renders to content type as requested by the client.
 
-##3. Status Codes
+## 3. Status Codes
 
-在views当中使用数字化的HTTP状态码，会使你的代码不宜阅读，且不容易发现代码中的错误。rest framework为每个状态码提供了更明确的标识。例如`HTTP_400_BAD_REQUEST`在`status` module。相比于使用数字，在整个views中使用这类标识符将更好。
+在views當中使用數字化的HTTP狀態碼，會使你的代碼不宜閱讀，且不容易發現代碼中的錯誤。rest framework為每個狀態碼提供了更明確的標識。例如HTTP_400_BAD_REQUEST在status module。相比於使用數字，在整個views中使用這類標識符將更好。
 
-##4. 封装API views
+## 4. 可包裝的API views
 
-在编写API views时，REST Framework提供了两种wrappers：
+在編寫API views時，REST Framework提供了兩種wrappers：
 
-1. `@api_viwe`decorator for working with *function based* views.
-2. `APIView` class for working with *class based* views.
+1. The `@api_viwe` decorator for working with function based views.
+2. The `APIView` class for working with class based views.
 
-这两种封装器提供了许多功能，例如，确保在view当中能够接收到`Request`实例；往`Response`中增加内容以便内容协商content negotiation 机制能够执行。
+這兩種封裝器提供了許多功能，例如，確保在view當中能夠接收到`Request`實例；往`Response`中增加內容以便內容協商content negotiation 機制能夠執行。
 
-封装器也提供一些行为，例如在适当的时候返回`405 Methord Not Allowed`响应；在访问多类型的输入`request.DATA`时，处理任何的`ParseError`异常。
+封裝器也提供一些行為，例如在適當的時候返回`405 Methord Not Allowed`響應；在不正確輸入`request.data`時，處理任何的`ParseError`異常。
 
-##5. 汇总
+## 5. 彙總
 
-我们开始用这些新的组件来写一些views。
+我們開始用這些新的組件來寫一些views。
 
-我们不在需要`JESONResponse` 类（在前一篇中创建），将它删除。删除后我们开始稍微重构下我们的view
+我們不在需要`JESONResponse` 類（在前一篇中`view.py`中創建），將它刪除。刪除後我們開始稍微重構下我們的view
 
     from rest_framework import status
     from rest_framework.decorators import api_view
     from rest_framework.response import Response
     from snippets.models import Snippet
     from snippets.serializers import SnippetSerializer
-    
+
     @api_view(['GET', 'POST'])
     def snippet_list(request):
         """
@@ -51,19 +51,17 @@ rest framework引入了一个`Response` 对象，它继承自`TemplateResponse`�
         """
         if request.method == 'GET':
             snippets = Snippet.objects.all()
-            serializer = SnippetSerializer(snippets)
+            serializer = SnippetSerializer(snippets, many=True)
             return Response(serializer.data)
-    
+
         elif request.method == 'POST':
-            serializer = SnippetSerializer(data=request.DATA)
+            serializer = SnippetSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-上面的代码是对我们之前代码的改进。看上去更简洁，也更类似于django的forms api形式。我们也采用了状态码，使返回值更加明确。
-下面是对单个snippet操作的view更新：
+上面的代碼是對我們之前代碼的改進。看上去更簡潔，也更類似於django的forms api形式。我們也採用了狀態碼，使返回值更加明確。 下面是對單個snippet操作的view更新：
 
     @api_view(['GET', 'PUT', 'DELETE'])
     def snippet_detail(request, pk):
@@ -74,30 +72,30 @@ rest framework引入了一个`Response` 对象，它继承自`TemplateResponse`�
             snippet = Snippet.objects.get(pk=pk)
         except Snippet.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
         if request.method == 'GET':
             serializer = SnippetSerializer(snippet)
             return Response(serializer.data)
-    
+
         elif request.method == 'PUT':
-            serializer = SnippetSerializer(snippet, data=request.DATA)
+            serializer = SnippetSerializer(snippet, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         elif request.method == 'DELETE':
             snippet.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-注意，我们并没有明确的要求requests或者responses给出content type。`request.DATA`可以处理输入的`json`请求，也可以输入`yaml`和其他格式。类似的在response返回数据时，REST Framework返回正确的content type给client。
+注意，我們並沒有明確的要求requests或者responses給出content type。`request.data`可以處理輸入的`json` requests，也可以輸入yaml和其他格式。
+類似的在response返回數據時，REST Framework返回正確的content type給client。
 
-##6. 给URLs增加可选的格式后缀
+## 6. 給URLs增加可選的格式後綴
 
-利用在response时不需要指定content type这一事实，我们在API端增加格式的后缀。使用格式后缀，可以明确的指出使用某种格式，意味着我们的API可以处理类似http://example.com/api/items/4.json.的URL。
+利用在response時不需要指定content type這一事實，我們在API端增加格式的後綴。使用格式後綴，可以明確的指出使用某種格式，意味著我們的API可以處理類似`http://example.com/api/items/4.json.`的URL。
 
-增加`format`参数在views中，如：
+增加`format`參數在views中，如：
 
     def snippet_list(request, format=None):
 
@@ -105,22 +103,24 @@ and
 
     def snippet_detail(request, pk, format=None):
 
-现在稍微改动`urls.py`文件，在现有的URLs中添加一个格式后缀pattterns (`format_suffix_patterns`):
+現在稍微改動urls.py文件，在現有的URLs中添加一個格式後綴pattterns (format_suffix_patterns):
 
     from django.conf.urls import patterns, url
     from rest_framework.urlpatterns import format_suffix_patterns
-    
-    urlpatterns = patterns('snippets.views',
+
+    urlpatterns =[
         url(r'^snippets/$', 'snippet_list'),
         url(r'^snippets/(?P<pk>[0-9]+)$', 'snippet_detail'),
-    )
+    ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
-这些额外的url patterns并不是必须的。
+    urlpatterns = format_suffix_patterns(urlpatterns) 
 
-##7. How's it looking?
+這些額外的url patterns並不是必須的。
 
-Go ahead and test the API from the command line, as we did in tutorial part 1. Everything is working pretty similarly, although we've got some nicer error handling if we send invalid requests.
+## 7. How's it looking?
+
+Go ahead and test the API from the command line, as we did in tutorial part 1. Everything is working pretty similarly,
+although we've got some nicer error handling if we send invalid requests.
 
 We can get a list of all of the snippets, as before.
 
@@ -142,19 +142,20 @@ Similarly, we can control the format of the request that we send, using the Cont
     # POST using form data
     curl -X POST http://127.0.0.1:8000/snippets/ -d "code=print 123"
     {"id": 3, "title": "", "code": "123", "linenos": false, "language": "python", "style": "friendly"}
-    
+
     # POST using JSON
     curl -X POST http://127.0.0.1:8000/snippets/ -d '{"code": "print 456"}' -H "Content-Type: application/json"
     {"id": 4, "title": "", "code": "print 456", "linenos": true, "language": "python", "style": "friendly"}
 
-Now go and open the API in a web browser, by visiting http://127.0.0.1:8000/snippets/.
+Now go and open the API in a web browser, by visiting `http://127.0.0.1:8000/snippets/`.
 
-##8. Browsability
+## 8. Browsability
 
-Because the API chooses the content type of the response based on the client request, it will, by default, return an HTML-formatted representation of the resource when that resource is requested by a web browser. This allows for the API to return a fully web-browsable HTML representation.
+Because the API chooses the content type of the response based on the client request, it will, by default, return an 
+HTML-formatted representation of the resource when that resource is requested by a web browser. This allows for the API to 
+return a fully web-browsable HTML representation.
 
-Having a web-browsable API is a huge usability win, and makes developing and using your API much easier. It also dramatically lowers the barrier-to-entry for other developers wanting to inspect and work with your API.
+Having a web-browsable API is a huge usability win, and makes developing and using your API much easier. It also dramatically 
+lowers the barrier-to-entry for other developers wanting to inspect and work with your API.
 
-See the [browsable api][browsable api] topic for more information about the browsable API feature and how to customize it.
-
-[browsable api]: http://django-rest-framework.org/topics/browsable-api.html
+See the browsable api topic for more information about the browsable API feature and how to customize it.
