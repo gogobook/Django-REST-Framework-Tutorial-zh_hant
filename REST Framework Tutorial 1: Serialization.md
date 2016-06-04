@@ -172,7 +172,8 @@
     # type(content)
     # bytes
 
-反序列化也很簡單，首先我們要將一個輸入流（content），轉換成python的原生數據類型 `這裡可能可以做一些修改，使用json.loads(content.decodez())，可返回python 的dict資料類型`
+反序列化也很簡單，首先我們要將一個輸入流（content），轉換成python的原生數據類型
+`這裡可能可以做一些修改，使用json.loads(content.decode())，可返回python 的dict資料類型`
 
     import StringIO
 
@@ -269,7 +270,7 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
         """
         if request.method == 'GET':
             snippets = Snippet.objects.all()
-            serializer = SnippetSerializer(snippets)
+            serializer = SnippetSerializer(snippets, many=True)
             return JSONResponse(serializer.data)
 
         elif request.method == 'POST':
@@ -314,11 +315,13 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
             return HttpResponse(status=204)
 
 將views.py保存，在Snippets目錄下面創建urls.py,添加以下內容：
+    from django.conf.urls import url
+    from snippets import views
 
-    urlpatterns = patterns('snippets.views',
-        url(r'^snippets/$', 'snippet_list'),
-        url(r'^snippets/(?P<pk>[0-9]+)/$', 'snippet_detail'),
-    )
+    urlpatterns = [
+        url(r'^snippets/$', views.snippet_list),
+        url(r'^snippets/(?P<pk>[0-9]+)/$', views.snippet_detail),
+    ]
 We also need to wire up the root urlconf, in the tutorial/urls.py file, to include our snippet app's URLs.
 
     from django.conf.urls import url, include
@@ -392,4 +395,12 @@ It's worth noting that there are a couple of edge cases we're not dealing with p
     }
 
 ## Where are we now
-我們目前還可以，我們已經有一個序列化API，有點像Django's Forms API，和一些Django views。我們的API此時無法做任何特別的動作，除了提供`json`回應，也需要錯誤處理機制，但這已經是一個有功能的API。
+我們目前還可以，我們已經有一個序列化API，有點像Django's Forms API，和一些Django views。
+我們的API此時無法做任何特別的動作，除了提供`json`回應，也需要錯誤處理機制，但這已經是一個有功能的API。
+
+心得
+
+SnippetSerializer類別繼承了rest_framework的serializer.Serializer類別，因而有些方法在程式碼上看不到；
+像是SS.is_valid()和SS.save()，save()之後會直接將資料丟進資料庫。作者想表達的是從資料庫物件經序列化到json(b)，
+再從json經反序列化回到資料庫物件，都是使用serializer.Serializer類別來完成。
+在教學的最部分則是用views只是把json包裝一下()，再Response出來。

@@ -6,44 +6,46 @@
 
 ## 1. 為API根創建一個endpoint
 
-到目前為止，我們已經有了'snippets'和'users'的endpoint, 但是我們還沒有為我們的API單獨創立一個端點入口。我們可以用常規的基於函數的view和之前介紹的 `@api_view `修飾符來創建。
-
-    from rest_framework import renderers
+到目前為止，我們已經有了'snippets'和'users'的endpoint, 但是我們還沒有為我們的API單獨創立一個端點入口。
+我們可以用常規的基於函數的view和之前介紹的 `@api_view `修飾符來創建。在你的`snippets/views.py`加入下列程式碼。
+    
     from rest_framework.decorators import api_view
     from rest_framework.response import Response
     from rest_framework.reverse import reverse
 
-    @api_view(('GET',))
+
+    @api_view(['GET'])
     def api_root(request, format=None):
         return Response({
             'users': reverse('user-list', request=request, format=format),
             'snippets': reverse('snippet-list', request=request, format=format)
         })
 
-請注意，我們用 REST framework 的 reverse 函數來返回完全合規的URLs.
+請注意二件事，第一，我們用 REST framework 的 `reverse` 函數來返回完全合規的URLs.第二，由convenience names來識別URL patterns，稍後我們將於`snippers/urls.py`中宣告
 
 ## 2. 為高亮的Snippet創建一個endpoint
 
 我們目前還沒有為支持代碼高亮的Snippet創建一個endpoints.
 
-與之前的API endpoints不同, 我們將直接使用HTML呈現，而非JSON。在 REST framework中有兩種風格的HTML render, 一種使用模板來處理HTML，一種則使用預先處理的方式。在這裡我們使用後者。
+與之前的API endpoints不同, 我們將直接使用HTML呈現，而非JSON。在 REST framework中有兩種風格的HTML render, 一種使用模板來處理HTML，
+一種則使用預先處理的方式。在這裡我們使用後者。
 
 另一個需要我們考慮的是，對於高亮代碼的view並沒有具體的泛型view可以直接利用。我們將只返回實例的一個屬性而不是物件實例本身。
 
-沒有具體泛型view的支持，我們使用基類來表示實例，並創建我們自己的 `.get() `方法。在你的 `snippets.views `中增加：
+沒有具體泛型view的支持，我們使用基類來表示實例，並創建我們自己的 `.get() `方法。在你的 `snippets/views.py `中增加：
 
     from rest_framework import renderers
     from rest_framework.response import Response
 
-    class SnippetHighlight(generics.SingleObjectAPIView):
-        model = Snippet
+    class SnippetHighlight(generics.GenericAPIView):
+        model = Snippet.objects.all()
         renderer_classes = (renderers.StaticHTMLRenderer,)
 
         def get(self, request, *args, **kwargs):
             snippet = self.get_object()
             return Response(snippet.highlighted) 
 
-和以往一樣，我們需要為新的view增加新的URLconf，如下增加urlpatterns:
+和以往一樣，我們需要為新的view增加新的`snippets/urls.py`，如下增加urlpatterns:
 
     url(r'^$','api_root'),
 
@@ -57,8 +59,8 @@
 
     * 使用主鍵；
     * 使用超鏈接；
-    * 使用相關實體唯一標識的字段；
-    * 使用相關實體的默認字符串表示；
+    * 使用相關實體唯一標識的slug字段；
+    * 使用相關實體的預設的字符串呈現型；
     * 在父級表示中嵌入子級實體；
     * 其他自定義的表示。
 
@@ -68,22 +70,26 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 `HyperlinkedModelSerializer` 與 `ModelSerializer` 有如下的區別:
 
-    * 缺省狀態下不包含 pk 字段；
+    * 預設狀態下不包含 pk 字段；
 
     * 具有一個 url 字段，即HyperlinkedIdentityField類型.
 
     * 用HyperlinkedRelatedField表示關係，而非PrimaryKeyRelatedField.
 
-    * 我們可以很方便的改寫現有代碼來使用超連接方式：
+我們可以很方便的改寫現有代碼來使用超連接方式，在你的`snippets/serializers.py`加入下面的程式碼。
+
 ```python
-    class SnippetSerializer(serializers.HyperlinkedModelSerializer): owner = serializers.Field(source='owner.username') highlight = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')
+    class SnippetSerializer(serializers.HyperlinkedModelSerializer): 
+        owner = serializers.Field(source='owner.username') 
+        highlight = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')
 
       class Meta:
-          model = models.Snippet
+          model = Snippet
           fields = ('url', 'highlight', 'owner',
                     'title', 'code', 'linenos', 'language', 'style')
 
-    class UserSerializer(serializers.HyperlinkedModelSerializer): snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail')
+    class UserSerializer(serializers.HyperlinkedModelSerializer): 
+        snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
 
       class Meta:
           model = User
@@ -93,20 +99,24 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 因為我們已經有一個 '.json'的後綴，為了更好的表明`highlight`字段鏈接的區別，使用一個 '.html' 的後綴。
 
-## 4. 正確使用URL patterns
+## 4. 確認URL patterns被命名
 
 如果要使用超鏈接API，就必須確保正確的命名和使用 URL patterns. 我們來看看我們需要命名的 URL patterns：
 
     * 指向 'user-list' 和 'snippet-list' 的API根.
     * snippet的序列化器，包括一個 'snippet-highlight'字段.
     * user序列化器，包含一個 'snippet-detail'字段.
-    * snippet 和user的序列化器，包含 'url' 字段（會缺省指向'snippet-detail' 和 'user-detail'.
+    * snippet 和user的序列化器，包含 'url' 字段（會預設指向`{model_name}-detail`)在此會指向'snippet-detail' 和 'user-detail'.
 
-一番工作之後，最終的 'urls.py' 文件應該如下所示：
+一番工作之後，最終的 'snippets/urls.py' 文件應該如下所示：
+
+    from django.conf.urls import url, include
+    from rest_framework.urlpatterns import format_suffix_patterns
+    from snippets import views
 
     # API endpoints
-    urlpatterns = format_suffix_patterns(patterns('snippets.views',
-        url(r'^$', 'api_root'),
+    urlpatterns = format_suffix_patterns([
+        url(r'^$', views.api_root),
         url(r'^snippets/$',
             views.SnippetList.as_view(),
             name='snippet-list'),
@@ -122,13 +132,13 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
         url(r'^users/(?P<pk>[0-9]+)/$',
             views.UserDetail.as_view(),
             name='user-detail')
-    ))
+    ])
 
     # Login and logout views for the browsable API
-    urlpatterns += patterns('',    
+    urlpatterns += [
         url(r'^api-auth/', include('rest_framework.urls',
                                 namespace='rest_framework')),
-    ) 
+    ]
 
 ## 5. 添加分頁
 
@@ -136,7 +146,7 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 通過在`settings.py` 中添加如下配置，我們就能在結果列表中增加分頁的功能:
 
-    REST_FRAMEWORK ={'PAGINATE_BY':10}
+    REST_FRAMEWORK ={'PAGE_SIZE':10}
 
 請注意REST framework的所有配置信息都是存放在一個叫做 'REST_FRAMEWORK'的dictionary中，以便於其他配置區分。
 
