@@ -9,7 +9,7 @@ REST framework包含一個抽象概念來處理`ViewSets`，它使得開發者�
 
 讓我們取出當前集合的views，使用view sets將它們重構。
 
-首先讓我們重構我們的`UserList`和`UserDetail`成一個`UserViewSet`。我們可以移除兩個views，用一個類來替換它們。
+首先讓我們重構我們的`UserList`和`UserDetail`成為單一個`UserViewSet`。我們可以移除兩個views，用一個類來替換它們。
     
     from rest_framework import viewsets
     
@@ -48,7 +48,7 @@ REST framework包含一個抽象概念來處理`ViewSets`，它使得開發者�
         def perform_create(self, serializer):
             serializer.save(owner=self.request.user)
 
-這次我們將使用ModelViewSet類為了得到默認read和write操作的完整集合。
+這次我們將使用`ModelViewSet`類為了得到默認read和write操作的完整集合。
 
 注意我們還使用`@detail_route`修飾符來創建一個自定義動作名為`highlight`。這個修飾符可以用來添加任何自定義endpoints，不用符合標準的`create`/`update`/`delete`樣式。
 

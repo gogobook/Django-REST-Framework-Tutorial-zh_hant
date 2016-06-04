@@ -2,7 +2,7 @@
 
 [src](http://django-rest-framework.org/tutorial/5-relationships-and-hyperlinked-apis.html)
 
-到目前為止，在我們的API中關係（relationship）還是通過主鍵來表示的。在這部分的教程中，我們將用超鏈接方式來表示關係，從而提升API的統一性和可發現性。
+到目前為止，在我們的API中關係（relationship）還是通過主鍵來表示的。在這部分的教程中，我們將用超鏈接方式來表示關係，從而提升API的一致性和可發現性。
 
 ## 1. 為API根創建一個endpoint
 
@@ -55,7 +55,7 @@
 
 ## 3. API超鏈接化
 
-在Web API設計中，處理實體間關係是一個有挑戰性的工作。我們有許多方式來表示關係：
+在Web API設計中，處理實體間關係是一個有挑戰性的工作。我們有許多方式來表示關係： # 什麼叫做實體之間的關係?
 
     * 使用主鍵；
     * 使用超鏈接；
@@ -66,15 +66,15 @@
 
 REST framework支持所有這些方式，包括正向或者反向的關係，或者將其應用到自定義的管理類中，例如泛型外鍵。
 
-在這部分，我們使用超鏈接方式。為了做到這一點，我們需要在序列化器中用 `HyperlinkedModelSerializer` 來替代之前的`ModelSerializer`.
+在這一節中，我們使用超鏈接方式。為了做到這一點，我們需要在序列化器中用 `HyperlinkedModelSerializer`類別 來替代之前的`ModelSerializer`類別.
 
 `HyperlinkedModelSerializer` 與 `ModelSerializer` 有如下的區別:
 
-    * 預設狀態下不包含 pk 字段；
+    * 預設狀態下不包含 `pk` 字段；
 
-    * 具有一個 url 字段，即HyperlinkedIdentityField類型.
+    * 具有一個`url` 字段，即`HyperlinkedIdentityField`類型.
 
-    * 用HyperlinkedRelatedField表示關係，而非PrimaryKeyRelatedField.
+    * 用`HyperlinkedRelatedField`表示關係，而非`PrimaryKeyRelatedField`.
 
 我們可以很方便的改寫現有代碼來使用超連接方式，在你的`snippets/serializers.py`加入下面的程式碼。
 
@@ -95,7 +95,7 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
           model = User
           fields = ('url', 'username', 'snippets')
 ```
-注意：我們也增加了一個新的 'highlight' 字段。該字段與 url 字段相同類型。不過它指向了 'snippet-highlight'的 url pattern, 而非'snippet-detail' 的url pattern.
+注意：我們也增加了一個新的 'highlight' 字段。該字段與 `url` 字段相同類型。不過它指向了 `snippet-highlight`的 url pattern, 而非`snippet-detail` 的url pattern.
 
 因為我們已經有一個 '.json'的後綴，為了更好的表明`highlight`字段鏈接的區別，使用一個 '.html' 的後綴。
 
@@ -103,8 +103,8 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 如果要使用超鏈接API，就必須確保正確的命名和使用 URL patterns. 我們來看看我們需要命名的 URL patterns：
 
-    * 指向 'user-list' 和 'snippet-list' 的API根.
-    * snippet的序列化器，包括一個 'snippet-highlight'字段.
+    * 指向 `user-list` 和 `snippet-list` 的API根.
+    * snippet的序列化器，包括一個 `snippet-highlight`字段.
     * user序列化器，包含一個 'snippet-detail'字段.
     * snippet 和user的序列化器，包含 'url' 字段（會預設指向`{model_name}-detail`)在此會指向'snippet-detail' 和 'user-detail'.
 
