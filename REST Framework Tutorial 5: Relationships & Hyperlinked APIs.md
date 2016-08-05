@@ -8,7 +8,8 @@
 
 到目前為止，我們已經有了'snippets'和'users'的endpoint, 但是我們還沒有為我們的API單獨創立一個端點入口。
 我們可以用常規的基於函數的view和之前介紹的 `@api_view `修飾符來創建。在你的`snippets/views.py`加入下列程式碼。
-    
+
+```python    
     from rest_framework.decorators import api_view
     from rest_framework.response import Response
     from rest_framework.reverse import reverse
@@ -20,20 +21,20 @@
             'users': reverse('user-list', request=request, format=format),
             'snippets': reverse('snippet-list', request=request, format=format)
         })
-
-請注意二件事，第一，我們用 REST framework 的 `reverse` 函數來返回完全合規的URLs.第二，由convenience names來識別URL patterns，稍後我們將於`snippers/urls.py`中宣告
+```
+請注意二件事，第一，我們用 REST framework 的 `reverse` 函數來返回完全合規的URLs.第二，由convenience names來識別URL patterns，稍後我們將於`snippers/urls.py`中宣告。 # django也有reverse，為何REST framework還要弄一個? 再來convenience name, 應該是指'users'與'snippets'，reverse包的那個才是URLs的名字。 
 
 ## 2. 為高亮的Snippet創建一個endpoint
 
 我們目前還沒有為支持代碼高亮的Snippet創建一個endpoints.
 
-與之前的API endpoints不同, 我們將直接使用HTML呈現，而非JSON。在 REST framework中有兩種風格的HTML render, 一種使用模板來處理HTML，
-一種則使用預先處理的方式。在這裡我們使用後者。
+與之前的API endpoints不同, 我們將直接使用HTML呈現，而非JSON。但不只是以HTML呈現，在 REST framework中有兩種風格的HTML render, 一種使用模板來處理HTML，一種則使用預先處理的方式。在這裡我們使用後者。
 
 另一個需要我們考慮的是，對於高亮代碼的view並沒有具體的泛型view可以直接利用。我們將只返回實例的一個屬性而不是物件實例本身。
 
 沒有具體泛型view的支持，我們使用基類來表示實例，並創建我們自己的 `.get() `方法。在你的 `snippets/views.py `中增加：
 
+```python    
     from rest_framework import renderers
     from rest_framework.response import Response
 
@@ -44,7 +45,7 @@
         def get(self, request, *args, **kwargs):
             snippet = self.get_object()
             return Response(snippet.highlighted) 
-
+```
 和以往一樣，我們需要為新的view增加新的`snippets/urls.py`，如下增加urlpatterns:
 
     url(r'^$','api_root'),
@@ -55,11 +56,11 @@
 
 ## 3. API超鏈接化
 
-在Web API設計中，處理實體間關係是一個有挑戰性的工作。我們有許多方式來表示關係： # 什麼叫做實體之間的關係?
+在Web API設計中，處理實體間關係是一個有挑戰性的工作。我們有許多方式來表示關係： # 什麼叫做實體之間的關係? 一對多，多對多和一對一。
 
     * 使用主鍵；
     * 使用超鏈接；
-    * 使用相關實體唯一標識的slug字段；
+    * 使用相關實體唯一標識的slug欄位；
     * 使用相關實體的預設的字符串呈現型；
     * 在父級表示中嵌入子級實體；
     * 其他自定義的表示。
@@ -70,10 +71,8 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 `HyperlinkedModelSerializer` 與 `ModelSerializer` 有如下的區別:
 
-    * 預設狀態下不包含 `pk` 字段；
-
-    * 具有一個`url` 字段，即`HyperlinkedIdentityField`類型.
-
+    * 預設狀態下不包含 `pk` 欄位；
+    * 具有一個`url` 欄位，即`HyperlinkedIdentityField`類型.
     * 用`HyperlinkedRelatedField`表示關係，而非`PrimaryKeyRelatedField`.
 
 我們可以很方便的改寫現有代碼來使用超連接方式，在你的`snippets/serializers.py`加入下面的程式碼。
@@ -85,28 +84,28 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
       class Meta:
           model = Snippet
-          fields = ('url', 'highlight', 'owner',
-                    'title', 'code', 'linenos', 'language', 'style')
+          fields = ('url', 'pk', 'highlight', 'owner',
+                    'title', 'code', 'linenos', 'language', 'style') #原先文件沒有pk，後面改有
 
     class UserSerializer(serializers.HyperlinkedModelSerializer): 
         snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
 
       class Meta:
           model = User
-          fields = ('url', 'username', 'snippets')
+          fields = ('url', 'pk', 'username', 'snippets') #原先文件沒有pk，後面改有
 ```
-注意：我們也增加了一個新的 'highlight' 字段。該字段與 `url` 字段相同類型。不過它指向了 `snippet-highlight`的 url pattern, 而非`snippet-detail` 的url pattern.
+注意：我們也增加了一個新的 'highlight' 欄位。該欄位與 `url` 欄位相同類型。不過它指向了 `snippet-highlight`的 url pattern, 而非`snippet-detail` 的url pattern.
 
-因為我們已經有一個 '.json'的後綴，為了更好的表明`highlight`字段鏈接的區別，使用一個 '.html' 的後綴。
+因為我們已經有一個 '.json'的後綴，為了更好的表明`highlight`欄位鏈接的區別，使用一個 '.html' 的後綴。
 
 ## 4. 確認URL patterns被命名
 
 如果要使用超鏈接API，就必須確保正確的命名和使用 URL patterns. 我們來看看我們需要命名的 URL patterns：
 
     * 指向 `user-list` 和 `snippet-list` 的API根.
-    * snippet的序列化器，包括一個 `snippet-highlight`字段.
-    * user序列化器，包含一個 'snippet-detail'字段.
-    * snippet 和user的序列化器，包含 'url' 字段（會預設指向`{model_name}-detail`)在此會指向'snippet-detail' 和 'user-detail'.
+    * snippet的序列化器，包括一個 `snippet-highlight`欄位.
+    * user序列化器，包含一個 'snippet-detail'欄位.
+    * snippet 和user的序列化器，包含 'url' 欄位（會預設指向`{model_name}-detail`)在此會指向'snippet-detail' 和 'user-detail'.
 
 一番工作之後，最終的 'snippets/urls.py' 文件應該如下所示：
 

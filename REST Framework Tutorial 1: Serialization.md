@@ -168,7 +168,7 @@
 
     content = JSONRenderer().render(serializer.data)
     content
-    # '{"pk": 1, "title": "", "code": "print \\"hello, world\\"\\n", "linenos": false, "language": "python", "style": "friendly"}'
+    # b'{"pk": 1, "title": "", "code": "print \\"hello, world\\"\\n", "linenos": false, "language": "python", "style": "friendly"}'
     # type(content)
     # bytes
 
@@ -403,4 +403,4 @@ It's worth noting that there are a couple of edge cases we're not dealing with p
 SnippetSerializer類別繼承了rest_framework的serializer.Serializer類別，因而有些方法在程式碼上看不到；
 像是SS.is_valid()和SS.save()，save()之後會直接將資料丟進資料庫。作者想表達的是從資料庫物件經序列化到json(b)，
 再從json經反序列化回到資料庫物件，都是使用serializer.Serializer類別來完成。
-在教學的最部分則是用views只是把json包裝一下()，再Response出來。
+在教學的最後部分則是用views只是把json包裝一下()，再Response出來。

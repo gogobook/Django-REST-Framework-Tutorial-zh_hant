@@ -14,7 +14,7 @@ rest framework 引入了一個繼承自HttpRequest的`Request`物件，該物件
 
 ## 2. Response Object ——Response物件
 
-rest framework引入了一個Response 物件，它是TemplateResponse的類型。它獲得未渲染的內容並通過內容協商content negotiation 來決定正確的content type返回給client。
+rest framework引入了一個Response 物件，它是TemplateResponse的類型。它獲得未渲染的內容並通過內容協商(content negotiation) 來決定正確的content type返回給client。
 
     return Response(data)  # Renders to content type as requested by the client.
 
@@ -29,7 +29,7 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
 1. The `@api_viwe` decorator for working with function based views.
 2. The `APIView` class for working with class based views.
 
-這兩種包裝器提供了許多功能，例如，確保在view當中能夠接收到`Request`實例；往`Response`中增加內容以便內容協商content negotiation 機制能夠執行。
+這兩種包裝器提供了許多功能，例如，確保在view當中能夠接收到`Request`實例；往`Response`中增加內容以便內容協商(content negotiation) 機制能夠執行。
 
 包裝器也提供一些行為，例如在適當的時候返回`405 Methord Not Allowed`回應；在不正確輸入`request.data`時，處理任何的`ParseError`異常。
 
@@ -106,7 +106,7 @@ and
 
     def snippet_detail(request, pk, format=None):
 
-現在稍微改動urls.py文件，在現有的URLs中添加一個格式後綴pattterns (format_suffix_patterns):
+現在稍微改動urls.py文件，在現有的URLs中添加一個格式後綴pattterns (format\_suffix\_patterns):
 
     from django.conf.urls import patterns, url
     from rest_framework.urlpatterns import format_suffix_patterns
@@ -121,8 +121,7 @@ and
 We don't necessarily need to add these extra url patterns in, but it gives us a simple, clean way of referring to a specific format.
 ## 7. How's it looking?
 
-Go ahead and test the API from the command line, as we did in tutorial part 1. Everything is working pretty similarly,
-although we've got some nicer error handling if we send invalid requests.
+Go ahead and test the API from the command line, as we did in tutorial part 1. Everything is working pretty similarly, although we've got some nicer error handling if we send invalid requests.
 
 We can get a list of all of the snippets, as before.
 

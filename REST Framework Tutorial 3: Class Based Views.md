@@ -5,14 +5,14 @@
 在之前基於函數的View之外，我們還可以用基於類的view來實現我們的API view。正如我們即將看到的那樣，這樣的方式可以讓我們重用公用功能，並使我們保持代碼DRY。
 
 ## 1.用基於類的view重寫我們的API 
- 我們要用基於類的view來重寫剛才的`view.py`，如下重構所示：
+我們要用基於類的view來重寫剛才的`view.py`，如下重構所示：
 
 ```python
     from snippets.models import Snippet
-    from snippets.serializers import SnippetSerializer #序列化器，序列化\反序列化都靠它
+    from snippets.serializers import SnippetSerializer #序列化器，序列化/反序列化都靠它
     from django.http import Http404
     from rest_framework.views import APIView
-    from rest_framework.response import Response #取代Render \ HttpResponse
+    from rest_framework.response import Response #取代Render / HttpResponse
     from rest_framework import status
 
     class SnippetList(APIView):                     # 繼承APIView類，List表示會丟出所有資料
@@ -96,7 +96,7 @@ urlpatterns = format_suffix_patterns(urlpatterns)
 
     class SnippetList(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
-                      generics.GenericAPIView):
+                      generics.GenericAPIView):  #注意generics.GenericAPIView 在最後面
         queryset = Snippet.objects.all()
         serializer_class = SnippetSerializer
 
@@ -114,7 +114,7 @@ urlpatterns = format_suffix_patterns(urlpatterns)
     class SnippetDetail(mixins.RetrieveModelMixin,
                         mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin,
-                        generics.GenericAPIView):
+                        generics.GenericAPIView):  #注意generics.GenericAPIView 在最後面
         queryset = Snippet.objects.all()
         serializer_class = SnippetSerializer
 
