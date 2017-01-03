@@ -24,7 +24,7 @@
 ```
 請注意二件事，第一，我們用 REST framework 的 `reverse` 函數來返回完全合規的URLs.第二，由convenience names來識別URL patterns，稍後我們將於`snippers/urls.py`中宣告。 # django也有reverse，為何REST framework還要弄一個? 再來convenience name, 應該是指'users'與'snippets'，reverse包的那個才是URLs的名字。 
 
-## 2. 為高亮的Snippet創建一個endpoint
+## 2. 為高亮的snippet創建一個endpoint
 
 我們目前還沒有為支持代碼高亮的Snippet創建一個endpoints.
 
@@ -84,15 +84,15 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
       class Meta:
           model = Snippet
-          fields = ('url', 'pk', 'highlight', 'owner',
-                    'title', 'code', 'linenos', 'language', 'style') #原先文件沒有pk，後面改有
+          fields = ('url', 'id', 'highlight', 'owner',
+                    'title', 'code', 'linenos', 'language', 'style') #原先文件沒有pk，後面改有；然後將pk 改為id。 
 
     class UserSerializer(serializers.HyperlinkedModelSerializer): 
         snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
 
       class Meta:
           model = User
-          fields = ('url', 'pk', 'username', 'snippets') #原先文件沒有pk，後面改有
+          fields = ('url', 'id', 'username', 'snippets') #原先文件沒有pk，後面改有；然後將pk 改為id。
 ```
 注意：我們也增加了一個新的 'highlight' 欄位。該欄位與 `url` 欄位相同類型。不過它指向了 `snippet-highlight`的 url pattern, 而非`snippet-detail` 的url pattern.
 

@@ -20,7 +20,7 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
 
 ## 3. Status Codes
 
-在views當中使用數字化的HTTP狀態碼，會使你的代碼不宜閱讀，且不容易發現代碼中的錯誤。rest framework為每個狀態碼提供了更明確的標識。例如HTTP_400_BAD_REQUEST在status module。相比於使用數字，在整個views中使用這類標識符將更好。
+在views當中使用數字化的HTTP狀態碼，會使你的代碼不宜閱讀，且不容易發現代碼中的錯誤。rest framework為每個狀態碼提供了更明確的標識。例如`HTTP_400_BAD_REQUEST`在status module。相比於使用數字，在整個views中使用這類標識符將更好。
 
 ## 4. 可包裝的API views
 
@@ -37,7 +37,7 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
 
 我們開始用這些新的組件來寫一些views。
 
-我們不在需要`JESONResponse` 類（在前一篇中`view.py`中創建，它的作用就是做為一個包裝器，將json資料進行包裝），將它刪除。刪除後我們開始稍微重構下我們的view
+我們不再需要`views.py`中的`JESONResponse` 類（在前一篇中`view.py`中創建，它的作用就是做為一個包裝器，將json資料進行包裝），將它刪除。刪除後我們開始稍微重構下我們的view
 
     from rest_framework import status
     from rest_framework.decorators import api_view
@@ -106,7 +106,7 @@ and
 
     def snippet_detail(request, pk, format=None):
 
-現在稍微改動urls.py文件，在現有的URLs中添加一個格式後綴pattterns (format\_suffix\_patterns):
+現在稍微更新urls.py文件，在現有的URLs中添加一個格式後綴pattterns (format\_suffix\_patterns):
 
     from django.conf.urls import patterns, url
     from rest_framework.urlpatterns import format_suffix_patterns

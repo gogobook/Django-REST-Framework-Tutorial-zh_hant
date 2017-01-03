@@ -15,10 +15,10 @@
 
 在`models.py`中的`Snippet`模型中增加這兩個field。
 
-    owner = models.ForeignKey('auth.User', related_name='snippets')
+    owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
     highlighted = models.TextField()
 
-我們還需要確保model存儲時，我們能使用 pygments 代碼高亮庫以生成語法高亮的field內容，。
+我們還需要確保model存儲時，我們能使用 `pygments` 代碼高亮庫以生成語法高亮的field內容，。
 
 首先需要一些額外的imports:
 
@@ -70,9 +70,11 @@
             model = User
             fields = ('id', 'username', 'snippets')
 ```
-因為 'snippets' 和用戶model是反向關聯（reverse relationship，即多對一），所以在使用`ModelSerializer`時並不會預設加入，所以我們需要加入一顯式field的來實現。
+因為 `'snippets'` 和用戶model是反向關聯（reverse relationship，即多對一），所以在使用`ModelSerializer`時並不會預設加入，所以我們需要加入一顯式field的來實現。
 
 我們還需要加一些views到views.py，對用戶呈現型上，我們偏好使用唯讀式的view，所以將使用 `ListAPIView` 和 `RetrieveAPIView` 泛型class-based Views。
+from django.contrib.auth.models import User
+
 
     class UserList(generics.ListAPIView):
         queryset = User.objects.all()
@@ -111,7 +113,7 @@
 
 Note: 確定你有在class Meta:的field列表中也加入了 'owner'。 
 
-這個field所做的十分有趣。source 參數控制某屬性以做為一個field，可以指向序列化實例的任何屬性。它可以採用如上的點式表示（dotted notation），在這個案例它將直接遍歷到指定的屬性。在Django's template中使用時，也是採用類似的方式。
+這個field所做的一些事是十分有趣。`source` 參數控制某屬性以做為一個field，可以指向序列化實例的任何屬性。它可以採用如上的點式表示（dotted notation），在這個案例它將直接遍歷到指定的屬性。在Django's template中使用時，也是採用類似的方式。
 
 我們增加field是一個無類型 `ReadOnlyField` 類，而我們之前的field都是有類型的，例如 `CharField`, `BooleanField` etc... 
 無類型`ReadOnlyField`field總是只讀的，它們只用在序列化呈現型中，而在反序列化時（修改model）不被使用。在此(反序列化)我們也可以使用`CharField(read_only=True)`
@@ -134,7 +136,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
 
 如果你打開瀏覽器，訪問可瀏覽API，你會發現只有登錄後才能創建新的snippet了，為此我們需要可以login為user。
 
-我們可以編輯urls.py來增加一個登錄view。首先增加新的import：
+我們可以編輯project-level 的urls.py來增加一個登錄view。首先增加新的import：
 
     from django.conf.urls import include
 
@@ -147,7 +149,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
                                namespace='rest_framework')),
     ]
 ```
-具體的， r'^api-auth/' 部分可以用任何你想用的URL來替代。這裡唯一的限制就是 urls 必須使用'rest_framework' 命名空間。
+具體的， `r'^api-auth/'` 部分可以用任何你想用的URL來替代。這裡唯一的限制就是 urls 必須使用`'rest_framework'` 命名空間。
 在Django 1.9+，REST framework將會設定namespace，所以你可以不用理它。
 
 現在如果你打開瀏覽器，刷新頁面會看到頁面右上方的 'Login' 鏈接。如果你用之前的用戶登錄後，你就又可以創建 snippets了。
@@ -160,7 +162,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
 
 為了實現這個需求，我們需要創建定製的權限（custom permission）。
 
-在 snippets 應用中，創建一個新文件： permissions.py `一個獨立的permissions.py，代表權限不屬於views.py or models.py`
+在 snippets 應用中，創建一個新文件： `permissions.py` `一個獨立的permissions.py，代表權限不屬於views.py or models.py`
 
 ```python
     from rest_framework import permissions # 注意這個permissions是來自rest_framework
@@ -179,7 +181,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
             # Write permissions are only allowed to the owner of the snippet
             return obj.owner == request.user 
 ```
-現在我們可以為snippet實例增加定製權限了，需要編輯 SnippetDetail view class的 permission_classes 屬性： `# 這應該是views.py內`
+現在我們可以為snippet實例增加定製權限了，需要編輯 `SnippetDetail` view class的 permission_classes 屬性： `# 這應該是在views.py內`
 
 ```python
 
@@ -194,7 +196,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
 
 ## 8. 通過API認證
 
-我們已經有了一系列的權限，如果我們需要編輯任何snippet，我們需要認證我們的request。因為我們還沒有建立任何 `authentication classes`,所以目前是默認的SessionAuthentication 和BasicAuthentication在起作用。
+我們已經有了一系列的權限，如果我們需要編輯任何snippet，我們需要認證我們的request。因為我們還沒有建立任何 `authentication classes`,所以目前是默認的`SessionAuthentication` 和`BasicAuthentication`在起作用。
 
 當我們通過Web瀏覽器與API互動時，我們登錄後、然後瀏覽器session可以為所有的request提供所需的驗證。
 

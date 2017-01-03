@@ -1,6 +1,7 @@
 # Tutorial 1: 序列化 Serialization
 
 `新的教學好像改了很多東西，201606更新`
+`201701更新`
 
 ## 1. 設置一個新的環境
 
@@ -20,32 +21,19 @@
 
 ## 2. 開始
 
-環境準備好只好，我們開始創建我們的項目
+我們已經準備好開始寫程式碼，開始創建我們的項目
 
     $ cd ~
     $ django-admin.py startproject tutorial
     $ cd tutorial
 
-項目創建好後，我們再創建一個簡單的app
+項目創建好後，我們再創建一個簡單的app，我們將使用這個app來創建一個簡單的Web api.
 
     $python manage.py startapp snippets
 
-我們使用sqlite3來運行我們的項目tutorial，編輯tutorial/settings.py,
-將資料庫的默認引擎engine改為sqlite3, 資料庫的名字NAME改為tmp.db
+我們必須把`snippets`與`rest_framework`加到`INSTALLED_APPS`，編輯tutorial/settings.py。
 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'tmp.db',
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': '',
-        }
-    }
-
-同時更改settings.py文件中的INSTALLD_APPS,添加我們的APP snippets和rest_framework
-
+   
     INSTALLED_APPS = (
         ...
         'rest_framework',
@@ -72,7 +60,7 @@
 
     class Snippet(models.Model):
         created = models.DateTimeField(auto_now_add=True)
-        title = models.CharField(max_length=100, default='')
+        title = models.CharField(max_length=100, blank=True, default='')
         code = models.TextField()
         linenos = models.BooleanField(default=False)
         language = models.CharField(choices=LANGUAGE_CHOICES,
@@ -99,7 +87,7 @@
     from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
     class SnippetSerializer(serializers.Serializer):
-        pk = serializers.IntegerField(read_only=True)  
+        id = serializers.IntegerField(read_only=True)  
         title = serializers.CharField(required=False,
                                     allow_blank=True,
                                     max_length=100)
@@ -137,7 +125,7 @@
 在某些情況下，欄位旗標也可以用來控制serializer 如何被顯示。比如繪出為HTML時，上述的`{'base_template': 'textarea.html'}` 是等於Django Form class的 `widget=widgets.Textarea`。
 這對於控制`browsable API`如何被顯示十分有用，我們將在稍後的教學中看到。
 
-我們也可以使用ModelSerializer來快速生成，後面我們將看到如何使用它。
+我們也可以使用ModelSerializer來快速生成，後面我們將看到如何使用它，但現在我們保持serializer定義明確。
 
 ## 5. 使用 Serializers
 
@@ -151,15 +139,18 @@
     from snippets.serializers import SnippetSerializer
     from rest_framework.renderers import JSONRenderer
     from rest_framework.parsers import JSONParser
+    # 這裡看起來怪怪的，不過應該是正確的，作者應該是想創建二個實例，但snippet名字留給第二個。
+    snippet = Snippet(code='foo = "bar"\n')
+    snippet.save()
 
     snippet = Snippet(code='print "hello, world"\n')
     snippet.save()
 
-我們現在獲得了一個Snippets的實例可以利用，現在我們對他進行以下序列化
+我們現在獲得了二個Snippets的實例可以利用，現在我們對其中一個進行以下序列化
 
     serializer = SnippetSerializer(snippet)
     serializer.data
-    # {'pk': 1, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}
+    # {'pk': 2, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}
     # type(serializer.data)
     # rest_framework.utils.serializer_helpers.ReturnDict
 
@@ -168,16 +159,16 @@
 
     content = JSONRenderer().render(serializer.data)
     content
-    # b'{"pk": 1, "title": "", "code": "print \\"hello, world\\"\\n", "linenos": false, "language": "python", "style": "friendly"}'
+    # b'{"pk": 2, "title": "", "code": "print \\"hello, world\\"\\n", "linenos": false, "language": "python", "style": "friendly"}'
     # type(content)
     # bytes
 
 反序列化也很簡單，首先我們要將一個輸入流（content），轉換成python的原生數據類型
 `這裡可能可以做一些修改，使用json.loads(content.decode())，可返回python 的dict資料類型`
 
-    import StringIO
+    from django.utils.six import BytesIO
 
-    stream = StringIO.StringIO(content)
+    stream = BytesIO(content)
     data = JSONParser().parse(stream)
 
 然後我們將該原生數據類型，轉換成物件實例
@@ -185,16 +176,18 @@
     serializer = SnippetSerializer(data=data)
     serializer.is_valid()
     # True
-    serializer.object
+    serializer.validated_data
+    # OrderedDict([('title', ''), ('code', 'print "hello, world"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')])
+    serializer.save()
     # <Snippet: Snippet object>
 
 注意這些API和django表單的相似處。這些相似點， 在我們講述在view中使用serializers時將更加明顯。
 
-We can also serialize querysets instead of model instances. To do so we simply add a many=True flag to the serializer arguments.
+We can also serialize querysets instead of model instances. To do so we simply add a `many=True` flag to the serializer arguments.
 
     serializer = SnippetSerializer(Snippet.objects.all(), many=True)
     serializer.data
-
+    # [OrderedDict([('id', 1), ('title', u''), ('code', u'foo = "bar"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 2), ('title', u''), ('code', u'print "hello, world"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 3), ('title', u''), ('code', u'print "hello, world"'), ('linenos', False), ('language', 'python'), ('style', 'friendly')])]
 ```sh    
     ReturnDict([('pk', 3),
             ('title', ''),
@@ -208,7 +201,7 @@ We can also serialize querysets instead of model instances. To do so we simply a
 ```
 ## 6. 使用 ModelSerializers
 
-SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能把這部分代碼去掉，看上去將更佳簡潔。
+SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能把這部分代碼去掉，看上去將更加簡潔。
 
 類似與django提供`Form`類和`ModelForm`類，Rest Framework也包含了`Serializer` 類和 `ModelSerializer`類。
 
@@ -243,7 +236,7 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
 
 我們創建一個HttpResponse 子類，這樣我們可以將我們返回的任何數據轉換成json。
 
-在snippet/views.py中添加以下內容：
+在`snippet/views.py`中添加以下內容：
 
     from django.http import HttpResponse
     from django.views.decorators.csrf import csrf_exempt
@@ -322,7 +315,7 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
         url(r'^snippets/$', views.snippet_list),
         url(r'^snippets/(?P<pk>[0-9]+)/$', views.snippet_detail),
     ]
-We also need to wire up the root urlconf, in the tutorial/urls.py file, to include our snippet app's URLs.
+We also need to wire up the root urlconf, in the `tutorial/urls.py` file, to include our snippet app's URLs.
 
     from django.conf.urls import url, include
 
@@ -353,7 +346,7 @@ It's worth noting that there are a couple of edge cases we're not dealing with p
     Quit the server with CONTROL-C.
 
 新開一個terminal來測試我們的server,來測試我們的server
-我們可以用curl或httpie來測試我們的API.httpie 是一個使用者友善的http client，由python寫成，讓我安裝它
+我們可以用curl或httpie來測試我們的API. httpie 是一個使用者友善的http client，由python寫成，讓我安裝它
 
     pip install httpie
 
@@ -393,6 +386,7 @@ It's worth noting that there are a couple of edge cases we're not dealing with p
         "language": "python",
         "style": "friendly"
     }
+Similarly, you can have the same json displayed by visiting these URLs in a web browser.
 
 ## Where are we now
 我們目前還可以，我們已經有一個序列化API，有點像Django's Forms API，和一些Django views。

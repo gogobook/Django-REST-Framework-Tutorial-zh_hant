@@ -16,7 +16,7 @@
 
 schema 是一個機器可讀的文件，描述了可用的API endpoints, URLs,及支援怎樣的操作。
 
-對於自動產出型的文件而言，schemas是非常有用的，而且可做為與API 互動的dynamic client 的驅動。
+對於自動產出型的文件而言，schemas是非常有用的，而且可做為與API 互動的dynamic client libraries的驅動。
 
 ## Core API
 REST framework使用Core API以提供schema支援。
