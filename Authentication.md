@@ -1,4 +1,4 @@
-認證是一個關連識別證書與連入request的機制，例如當使用者request所帶，或令符所簽用。權限與節流閥政策然後使用這些證書來決定request是否被允許。
+認證是一個關連一套識別證書與連入request的機制，例如當使用者request所帶，或令符所簽用。權限與節流閥政策然後使用這些證書來決定request是否被允許。
 REST framework 提供一些即可用的認證綱要，並允許你實作自訂綱要。
 認證總是在view最開始的時候執行，在permission與throttling check發生之前，並在任何程式碼被允許處理之前。
 `request.user` property 通常被設定給`contrib.auth` package's `User` class的實例。
@@ -16,7 +16,7 @@ REST framework 提供一些即可用的認證綱要，並允許你實作自訂�
 ## 設定認證網要
 
 預設的認證網要，可能是全域的，使用`DEFAULT_AUTHENTICATION_CLASSES` setting, 例如
-
+<!--TODO: 這裡有更新過，原本是tuple，現在是list-->
 ```python
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -58,7 +58,7 @@ def example_view(request, format=None):
     }
     return Response(content)
 ```
-## 未認及回應禁止
+## 未認證及回應禁止
 When an unauthenticated request is denied permission there are two different error codes that may be appropriate.
 
     * HTTP 401 Unauthorized
@@ -107,7 +107,7 @@ from rest_framework.authtoken.models import Token
 token = Token.objects.create(user=...)
 print token.key
 ```
-客端進行認，token key應包含於`Authentication` HTTP header. 此key 應前綴字串"Token" 並有空白鍵分隔二字串，例如
+客端進行認證，token key應放在`Authentication` HTTP header之中，此key 應前綴字串"Token" 並有空白鍵分隔二字串，例如
 
 ```
 Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
@@ -120,7 +120,7 @@ Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
 * `request.user` 將會是一個Django `User`的實例。
 * `request.auth` 將會是一個`rest_framework.authtoken.models.Token`的實例。
 
-末過認證的回應為拒絕權限將導致一個`HTTP 401 unauthorized` response並帶一個適當的`WWW-Authenticate` header, 例如
+末通過認證的回應為拒絕權限將導致一個`HTTP 401 unauthorized` response並帶一個適當的`WWW-Authenticate` header, 例如
 
 ```
 WWW-Authenticate: Token
@@ -133,12 +133,12 @@ curl -X GET http://127.0.0.1:8000/api/example/ -H 'Authorization: Token 9944b091
 ```
 ----
 **注意:** 假如你在生產環境使用`TokenAuthentication` 你一定要確定你的api僅能通過`https`使用。
-
+<!--很明顯地，這是由於token 是透過GET 來使用的，-->
 ----
 
-### 產生令符 -藉由使用signals
+### 產生token -藉由使用signals
 假如你想要每一個使用者都有一個自動產生的Token，你可以簡單的捕捉使用者的`post_save`訊號。
-
+<!--所以這可以在建立使用者時，自動地給使用者設定token -->
 ```python
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -181,4 +181,48 @@ urlpatterns += [
 ```
 注意預設的`obtain_auth_token` view 明確地使用JSON requests與responses，而不是使用在你的settings中預設的renderer與parser classes。假如你需要`obtain_auth_token` view的客製化版本，你可以藉如overriding `ObtainAuthToken` view class，並且將之用在你的url conf中。
 
-<!--未完待續-->[](http://www.django-rest-framework.org/api-guide/authentication/#authentication)
+預設中，`obtain_auth_token`並未套用任何permissions或throttling，假如你想要應用任何throttling，你將需要override view class, 並使用`thorttle_classes` attribute含入它們。
+[1060226](http://www.django-rest-framework.org/api-guide/authentication/#authentication)
+
+### 藉由 Django admin
+透過admin 介面可手動建立Tokens，以防萬一你正使用一個大user base，我們建議...
+
+## SessionAuthentication
+
+本認證網要使用Django 的預設session backend 作為認證，Session Authentication 是適合給AJAX客端用的，這會執行同樣的session context在你的website上。
+假如成功認證，`SessionAuthentication` 提供下列證書。
+    * `request.user` 將會是一個Django `User`物件
+    * `request.auth` 將會是`None`
+
+未通過認證將回應拒絕權限，並導`HTTP 403 Forbidden` 回應。
+假如你正在使用一個帶AJAX style API 的SessionAuthentication，你將需要確認你有帶入一個有效的CSRF token 給任何不安全的 'HTTP'方法呼叫，例如`PUT` `PATCH` `POST` `DELETE`，見Django CSRF 文件以了解細節。
+
+**警告** 總是在登入頁面，使用Django的標準登入view，這將確保你的登入views是有適當保護的。
+
+CSRF 驗證在REST framework 工作與在標準的Django中會有些許差異，由於需要支持兩者session與non-session based 在同一個views上，這意味著僅有authenticatd requests要有CSRF tokens, 而匿名requests可能不帶CSRF token。這行為並不適合用來登入views，因為這總是要有CSRF驗證。
+
+## Custom authentication
+略
+
+## Example
+
+```python
+from django.contrib.auth.models import User
+from rest_framework import authentication
+from rest_framework import exceptions
+
+class ExampleAuthentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        username = request.META.get('X_USERNAME')
+        if not username:
+            return None
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No such user')
+
+        return (user, None)
+```
+第三方套件
+略
