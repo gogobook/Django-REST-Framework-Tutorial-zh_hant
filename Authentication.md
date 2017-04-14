@@ -107,8 +107,17 @@ from rest_framework.authtoken.models import Token
 token = Token.objects.create(user=...)
 print token.key
 ```
-客端進行認證，token key應放在`Authentication` HTTP header之中，此key 應前綴字串"Token" 並有空白鍵分隔二字串，例如
+<!--上述例子還差一些東西
+from django.contrib.auth.models import User
+users=User.objects.all()
+token=Token.objects.create(user=users[0])
+print(token.key)
 
+-->
+<!--token 應該是僅作為簡便認證使用，而不該用於需要嚴謹認證的地方，比如發言，提問，但如果要進行交易則應該要進一步的認證。-->
+<!--注意認證綱要也要增加TokenAuthentication的部份，否則報401錯誤，請看前面"設定認證網要"-->
+客端進行認證，token key應放在`Authentication` HTTP header之中，此key 應前綴字串"Token" 並有空白鍵分隔二字串，例如
+<!--記得http header也要放入Content-Type: application/json-->
 ```
 Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
 ```
@@ -150,7 +159,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
 ```
-你將需要確定你將此段代碼放在一個已安裝的`models.py`模組中，或其位置而那是Django 啟動時就載入的。
+你將需要確定你將此段代碼放在一個已安裝的`models.py`模組中，或其他位置而那是Django 啟動時就載入的。
 假如你已建立一些使用者，你可以為所有既存的使用都產生tokens，用如下方法。
 
 ```python
@@ -163,7 +172,7 @@ for user in User.objects.all():
 
 ### 產生令符 -藉由曝露一個api endpoint
 
-當使用`TokenAuthentication` 你可能想要提供一個機制給客端，使得到一個token，由給定的username與password，  REST framework 提供一個內建的view以提供這個行為。在你的URLconf中加上`obtain_auth_token` view，以使用它。
+當使用`TokenAuthentication` 你可能想要提供一個機制給客端，使得到一個token，由給定的username與password，REST framework 提供一個內建的view以提供這個行為。在你的URLconf中加上`obtain_auth_token` view，以使用它。
 
 ```python
 from rest_framework.authtoken import views

@@ -108,7 +108,7 @@ and
 
 現在稍微更新urls.py文件，在現有的URLs中添加一個格式後綴pattterns (format\_suffix\_patterns):
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from rest_framework.urlpatterns import format_suffix_patterns
 
     urlpatterns =[

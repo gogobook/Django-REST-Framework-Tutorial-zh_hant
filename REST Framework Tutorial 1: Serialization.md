@@ -80,8 +80,8 @@
 
 ## 4. 創建序列化類
 
-我們要使用我們的web api，要做的第一件事就是提供snippets實例序列化和反序列化的方法， 以使snippets實例能轉換為可表述的內容，例如json.
-我們宣告一個串行器serializer，該串行器與django 的表單形式很類似。在snippets目錄下面，創建一個serializers.py ，並將下面內容拷貝到文件中。
+我們要使用我們的web api，要做的第一件事就是提供snippets實例序列化和反序列化的方法， 以使snippets實例能轉換為可表述的內容，例如`json`.
+我們宣告一個串行器serializer，該串行器與django 的表單形式很類似。在snippets目錄下面，創建一個`serializers.py` ，並將下面內容拷貝到文件中。
 
     from rest_framework import serializers
     from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
@@ -146,16 +146,16 @@
     snippet = Snippet(code='print "hello, world"\n')
     snippet.save()
 
-我們現在獲得了二個Snippets的實例可以利用，現在我們對其中一個進行以下序列化
-
-    serializer = SnippetSerializer(snippet)
+我們現在獲得了二個Snippets的實例可以利用，現在我們對其中一個進行以下序列化(**也就是把python的實例轉成json，比較正確的說法是轉成string\byte類的資料型態，其中的json是一串的key-value，故稱"序列"**) 
+*小心，如果要使用ModelSerializer*
+    serializer = SnippetSerializer(snippet) 
     serializer.data
     # {'pk': 2, 'title': u'', 'code': u'print "hello, world"\n', 'linenos': False, 'language': u'python', 'style': u'friendly'}
     # type(serializer.data)
     # rest_framework.utils.serializer_helpers.ReturnDict
 
 
-這時，我們將該實例轉成了python原生的數據類型。下面我們將該數據轉換成json格式，以完成序列化：
+這時，我們將該實例轉成了python原生的數據類型(.data是dict，但還有一堆其他的資料)。下面我們將該數據轉換成json格式，以完成序列化：
 
     content = JSONRenderer().render(serializer.data)
     content
@@ -173,7 +173,7 @@
 
 然後我們將該原生數據類型，轉換成物件實例
 
-    serializer = SnippetSerializer(data=data)
+    serializer = SnippetSerializer(data=data)#這裡不能跳過
     serializer.is_valid()
     # True
     serializer.validated_data
@@ -345,7 +345,7 @@ It's worth noting that there are a couple of edge cases we're not dealing with p
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
-新開一個terminal來測試我們的server,來測試我們的server
+新開一個terminal來測試我們的server,
 我們可以用curl或httpie來測試我們的API. httpie 是一個使用者友善的http client，由python寫成，讓我安裝它
 
     pip install httpie

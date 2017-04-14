@@ -26,8 +26,9 @@
     from pygments.formatters.html import HtmlFormatter
     from pygments import highlight
     
-我們現在為模型增加一個 `.save() 方法：# models.py中只有一個class Snippet(model.Model): 
-                                 # 因為進行語法高亮化的動作，所以需要一個額外的def save`
+我們現在為模型增加一個 `.save() `方法：
+- `# models.py中只有一個class Snippet(model.Model):` 
+- `# 因為要進行語法高亮化之後的儲存動作，所以需要一個額外的def save`
 
 ```python
     def save(self, *args, **kwargs):
@@ -73,8 +74,9 @@
 因為 `'snippets'` 和用戶model是反向關聯（reverse relationship，即多對一），所以在使用`ModelSerializer`時並不會預設加入，所以我們需要加入一顯式field的來實現。
 
 我們還需要加一些views到views.py，對用戶呈現型上，我們偏好使用唯讀式的view，所以將使用 `ListAPIView` 和 `RetrieveAPIView` 泛型class-based Views。
-from django.contrib.auth.models import User
 
+```python
+from django.contrib.auth.models import User
 
     class UserList(generics.ListAPIView):
         queryset = User.objects.all()
@@ -83,6 +85,7 @@ from django.contrib.auth.models import User
     class UserDetail(generics.RetrieveAPIView):
         queryset = User.objects.all()
         serializer_class = UserSerializer
+```
 同時記得將`UserSerializer` import 進來(views.py中)
 
     from snipperts.serializers import UserSerializer
@@ -190,7 +193,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
 ```
 別忘了import 這個`IsOwnerOrReadOnly `類。
 
-    from snippets.permissions importIsOwnerOrReadOnly 
+    from snippets.permissions import IsOwnerOrReadOnly 
 
 現在打開瀏覽器，你可以看見 'DELETE' 和 'PUT' 動作只會出現在那些你的登錄用戶創建的snippet頁面上了.
 
@@ -233,10 +236,9 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
   2. serializers.py 要增加UserSerializer的類，同時要 `from django.contrib.auth.models import User`
   3. SnippetSerializer 也要加一個欄位owner
   4. 我們現在的views.py是使用CBV，要加入`permission_classes = (permissions.IsAuthenticatedOrReadOnly,)` 
-  5. 我們還需要一個permissons.py，用以放置客製化的permisson `class IsOwnerOrReadOnly(permissions.BasePermission):`然後在detail類中使用
+  5. 我們還需要一個permissons.py，用以放置客製化的permission `class IsOwnerOrReadOnly(permissions.BasePermission):`然後在detail類中使用
   6. 然後還要給login 的連結，或者是通過api的認證。
 
 
 ## 心得
-這一小節的主要重點是權限與認證使用者，當然有時候權限會很複雜，REST framework 可以做到單一實例的權限管制其實滿厲害的，另這裡用到的generics class view 是read-only但最後的例子卻又是用post，到底是不是read-only還要試試看。
- 
+這一小節的主要重點是權限與認證使用者，當然有時候權限會很複雜，REST framework 可以做到單一實例的權限管制其實滿厲害的。
