@@ -11,7 +11,7 @@
 
 ## 1. 為model增加信息
 
-我們先需要對Snippet的model做些修改。首先，增加一些fields. 其中一個用來表示創建者，另一個用來存儲代碼中的HTML高亮。
+我們將對Snippet的model做些修改。首先，增加一些fields. 其中一個用來表示創建者，另一個用來存儲代碼中的HTML高亮。
 
 在`models.py`中的`Snippet`模型中增加這兩個field。
 
@@ -53,7 +53,7 @@
 
 你可能想創建一些其他用戶來測試這些API，最快捷的方式是利用 createsuperuser 命令。
 
-    python ./manage.py createsuperuser 
+    python manage.py createsuperuser 
 
 ## 2. 為用戶模型增加endpoints
 

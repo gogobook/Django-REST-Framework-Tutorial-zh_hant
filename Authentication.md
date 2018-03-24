@@ -1,17 +1,17 @@
-認證是一個關連一套識別證書與連入request的機制，例如當使用者request所帶，或令符所簽用。權限與節流閥政策然後使用這些證書來決定request是否被允許。
+認證是一個關連一套識別憑證與連入request的機制，例如當使用者request所帶，或令符所簽用。權限與限制策略然後使用這些憑證來決定request是否被允許。
 REST framework 提供一些即可用的認證綱要，並允許你實作自訂綱要。
 認證總是在view最開始的時候執行，在permission與throttling check發生之前，並在任何程式碼被允許處理之前。
 `request.user` property 通常被設定給`contrib.auth` package's `User` class的實例。
 `request.auth` property 通常作為任何額外的認證資訊，例如它可能用來呈現由request 所簽認的一個認證令符。
 
-**注意:** 別忘了，認證本身並不能阻止一個連入request，它只是簡單的識別request的證書。
-如何為你的API設定權限政策，請見權限文件。
+**注意:** 別忘了，認證本身並不能阻止一個連入request，它只是簡單的識別request的憑證。
+如何為你的API設定權限策略，請見權限文件。
 
 ## 認證如何被決定
-認證綱要總是被定義成類別的串列， REST framework將試著認證串列內的每個類別，並在認證成功後將第一個類別的返回值設定為`request.user`與`request.auth`。
+認證綱要總是被定義成類別的串列， REST framework將嘗試使用列表中的每個類進行認證，並在認證成功後將第一個類別的返回值設定為`request.user`與`request.auth`。
 
-如果沒有類別認證，`request.user`將成為`django.contrib.auth.models.AnonymousUser`的實例，而`request.auth`將設為`none`。
-給未認證的request的`request.user`與 `request.auth`的值，可以被`UNAUTHENTICATED_USER` and `UNAUTHENTICATED_TOKEN` settings改變。
+如果沒有類別認證，`request.user`將成為`django.contrib.auth.models.AnonymousUser`的實例，而且`request.auth`將設為`none`。
+未經認證的request的`request.user`與 `request.auth`的值，可以被`UNAUTHENTICATED_USER` and `UNAUTHENTICATED_TOKEN` settings改變。
 
 ## 設定認證網要
 
@@ -125,7 +125,7 @@ Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
 **注意:** 假如你想要在header使用不同的keyword，像是`Bearer`，簡單地子類`TokenAuthentication`並設置`keyword`類別變數。
 
 ----
-假如成功認證，`TokenAuthentication`提供下列證書。
+假如成功認證，`TokenAuthentication`提供下列憑證。
 * `request.user` 將會是一個Django `User`的實例。
 * `request.auth` 將會是一個`rest_framework.authtoken.models.Token`的實例。
 
@@ -199,7 +199,7 @@ urlpatterns += [
 ## SessionAuthentication
 
 本認證網要使用Django 的預設session backend 作為認證，Session Authentication 是適合給AJAX客端用的，這會執行同樣的session context在你的website上。
-假如成功認證，`SessionAuthentication` 提供下列證書。
+假如成功認證，`SessionAuthentication` 提供下列憑證。
     * `request.user` 將會是一個Django `User`物件
     * `request.auth` 將會是`None`
 
@@ -210,10 +210,25 @@ urlpatterns += [
 
 CSRF 驗證在REST framework 工作與在標準的Django中會有些許差異，由於需要支持兩者session與non-session based 在同一個views上，這意味著僅有authenticatd requests要有CSRF tokens, 而匿名requests可能不帶CSRF token。這行為並不適合用來登入views，因為這總是要有CSRF驗證。
 
+## RemoteUserAuthentication
+這種身份驗證方案允許您將身份驗證委託給設置`REMOTE_USER` 環境變量的Web服務器。
+
+要使用它，你必須有`django.contrib.auth.backends.RemoteUserBackend`（或者一個子類）在你的 `AUTHENTICATION_BACKENDS`設置中。默認情況下，為不存在的用戶名`RemoteUserBackend`創建`User`對象。要改變這個和其他行為，請參考 Django文檔。
+
+如果成功通過身份驗證，則`RemoteUserAuthentication`提供以下憑據：
+
+`request.user`將是一個Django `User`實例。
+`request.auth將會None`。
+有關配置身份驗證方法的信息，請參閱您的Web服務器的文檔，例如：
+
+Apache身份驗證方法
+NGINX（限制訪問）
 ## Custom authentication
 略
 
 ## Example
+以下示例將以名為'X_USERNAME'的自定義請求標頭中的用戶名給出的用戶身份驗證任何傳入請求。
+
 
 ```python
 from django.contrib.auth.models import User
@@ -233,5 +248,7 @@ class ExampleAuthentication(authentication.BaseAuthentication):
 
         return (user, None)
 ```
-第三方套件
-略
+## 第三方套件
+### drfpasswordless
+[drfpasswordless](https://github.com/aaronn/django-rest-framework-passwordless)為Django REST Framework自己的TokenAuthentication方案添加了無中心支持（Medium，Square Cash的靈感）。用戶登錄並註冊發送給聯繫點的令牌，如電子郵件地址或手機號碼。
+這個有點像二因子認證，只是認證位置是e-mail或簡訊，而且不用密碼。認證有效時間為15分鐘。然後取得 drf的Token，token可以用於drf的token 認證。

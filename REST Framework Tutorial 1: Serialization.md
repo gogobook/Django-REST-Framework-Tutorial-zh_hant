@@ -2,6 +2,12 @@
 
 `新的教學好像改了很多東西，201606更新`
 `201701更新`
+`201801更新`
+## 0. 介紹
+這個教學將包合建立一個簡單的pastebin 程式碼高亮 web api. 以此介紹REST framework所修飾的各種component, 並且讓你對所有的元件如何整合在一起有一個完整的了解。
+這個教學是非常深入的，所以你在開始前，可能要準備一些點心和一杯咖啡，假如你只是想要簡單看過，你應該去看quickstart
+<hr>
+**注意：**這個教學的程式碼可以在github 的tomchristie/rest-framework-tutorial 上找到，網路上也有完整的實作的砂盒版本。
 
 ## 1. 設置一個新的環境
 
@@ -238,21 +244,12 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
 
 在`snippet/views.py`中添加以下內容：
 
-    from django.http import HttpResponse
+    from django.http import HttpResponse, JsonResponse
     from django.views.decorators.csrf import csrf_exempt
     from rest_framework.renderers import JSONRenderer
     from rest_framework.parsers import JSONParser
     from snippets.models import Snippet
     from snippets.serializers import SnippetSerializer
-
-    class JSONResponse(HttpResponse):
-        """
-        An HttpResponse that renders it's content into JSON.
-        """
-        def __init__(self, data, **kwargs):
-            content = JSONRenderer().render(data)
-            kwargs['content_type'] = 'application/json'
-            super(JSONResponse, self).__init__(content, **kwargs)
 
 我們API的目的是，可以通過view來列舉全部的Snippet的內容，或者創建一個新的snippet
 
@@ -264,16 +261,16 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
         if request.method == 'GET':
             snippets = Snippet.objects.all()
             serializer = SnippetSerializer(snippets, many=True)
-            return JSONResponse(serializer.data)
+            return JsonResponse(serializer.data)
 
         elif request.method == 'POST':
             data = JSONParser().parse(request)
             serializer = SnippetSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
-                return JSONResponse(serializer.data, status=201)
+                return JsonResponse(serializer.data, status=201)
             else:
-                return JSONResponse(serializer.errors, status=400)
+                return JsonResponse(serializer.errors, status=400)
 
 注意，因為我們要能夠自client向該view 丟一個`Post`請求，所以我們要將該view 標註為csrf_exempt, 以說明不是一個CSRF事件。
 這並不是一個正常你想要做的事，且**REST framework** view事實上使用一個比csrf token更靈敏的行為，但我們現在就是要這麼做。
@@ -292,16 +289,16 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
 
         if request.method == 'GET':
             serializer = SnippetSerializer(snippet)
-            return JSONResponse(serializer.data)
+            return JsonResponse(serializer.data)
 
         elif request.method == 'PUT':
             data = JSONParser().parse(request)
             serializer = SnippetSerializer(snippet, data=data)
             if serializer.is_valid():
                 serializer.save()
-                return JSONResponse(serializer.data)
+                return JsonResponse(serializer.data)
             else:
-                return JSONResponse(serializer.errors, status=400)
+                return JsonResponse(serializer.errors, status=400)
 
         elif request.method == 'DELETE':
             snippet.delete()

@@ -4,7 +4,7 @@ REST framework包含一個抽象概念來處理`ViewSets`，它使得開發者�
 
 `ViewSet`類幾乎和`View`類一樣，除了它們提供像`read`或`update`操作，但沒有處理`get`和`put`的方法。
 
-一個`ViewSet`類只是綁定到一組方法處理程序在最後一刻，在它被實例化到一組視圖的時候，通常是使用一個`Router`類——為你處理定義`URL conf`的複雜性。
+一個`ViewSet`類只是在最後一刻綁定到一組方法處理程序，在它被實例化到一組視圖的時候，通常是使用一個`Router`類——為你處理定義`URL conf`的複雜性。
 ## 使用ViewSets來重構
 
 讓我們取出當前集合的views，使用view sets將它們重構。
@@ -24,43 +24,43 @@ REST framework包含一個抽象概念來處理`ViewSets`，它使得開發者�
 在這裡我們將使用`ReadOnlyModelViewSet`類來自動地提供默認的'read-only'操作。正如我們在使用一般的views做的，我們還是會設置`queryset`和`serializer_class`屬性，但我們不再需要提供相同的信息給兩個獨立的類。
 
 下一步我們將替換`SnippetList`,`SnippetDetial`和`SnippetHighlight`類。我們可以移除這三個views，再次用一個類來替換它們。
+```py
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-    from rest_framework import viewsets
-    from rest_framework.decorators import detail_route #原本是link改為detail_route，link應該是typo
+class SnippetViewSet(viewsets.ModelViewSet):
+    """
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
 
-    class SnippetViewSet(viewsets.ModelViewSet):
-        """
-        This viewset automatically provides `list`, `create`, `retrieve`,
-        `update` and `destroy` actions.
+    Additionally we also provide an extra `highlight` action.
+    """
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly,)
 
-        Additionally we also provide an extra `highlight` action. 
-        """
-        queryset = Snippet.objects.all()
-        serializer_class = SnippetSerializer
-        permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                              IsOwnerOrReadOnly,)
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
 
-        @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
-        def highlight(self, request, *args, **kwargs):
-            snippet = self.get_object()
-            return Response(snippet.highlighted)
-
-        def perform_create(self, serializer):
-            serializer.save(owner=self.request.user)
-
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+```
 這次我們將使用`ModelViewSet`類為了得到默認read和write操作的完整集合。
 
-注意我們還使用`@detail_route`修飾符來創建一個自定義動作名為`highlight`。這個修飾符可以用來添加任何自定義endpoints，不用符合標準的`create`/`update`/`delete`樣式。
+注意我們還使用`@action`修飾符來創建一個自定義動作名為`highlight`。這個修飾符可以用來添加任何自定義endpoints，不用符合標準的`create`/`update`/`delete`樣式。
 
-用`@detail_route`修飾符創建的自定義動作將會對`GET`做出響應。我們也可以使用`method`參數代替如果我們想要一個對`POST`請求做出響應的動作。
+用`@action`修飾符創建的自定義動作將會對`GET`做出響應。我們也可以使用`method`參數代替如果我們想要一個對`POST`請求做出響應的動作。
 
-The URLs for custom actions by default depend on the method name itself. If you want to change the way url should be constructed, you can include url_path as a decorator keyword argument.
+The URLs for custom actions by default depend on the method name itself. If you want to change the way url should be constructed, you can include `url_path` as a decorator keyword argument.
 
 ## 明確地绑定ViewSets到URLs
 
-handler method僅僅在我們定義URLConf的時候綁定到動作(actions)上。去看看蓋子下發生了什麼首先從我們的ViewSets明確地創建一個views集合。
+handler method僅僅在我們定義URLConf的時候綁定到動作(actions)上。去看看蓋子下發生了什麼事，首先從我們的ViewSets明確地創建一個views集合。
 
-在`urls.py`文件中我們綁定了我們的`ViewSet`類到一個具體views的集合。
+在`snippets/urls.py`文件中我們綁定了我們的`ViewSet`類到一個具體views的集合。
 
     from snippets.views import SnippetViewSet, UserViewSet，api_root
     from rest_framework import renderers
@@ -101,7 +101,7 @@ handler method僅僅在我們定義URLConf的時候綁定到動作(actions)上�
 
 因為我們使用`ViewSet`類而不是`View`類，我們實際上不用自己設計URL conf。連接resources到views和urls的約定可以使用`Router`類自動處理。我們要做的僅僅是用一個router註冊適當的view集合，and let it do the rest
 
-這裡我們重連接`urls.py`文件
+這裡我們重連接`snippets/urls.py`文件
 
 ```python    
     from django.conf.urls import url, include
@@ -117,7 +117,6 @@ handler method僅僅在我們定義URLConf的時候綁定到動作(actions)上�
     # Additionally, we include the login URLs for the browsable API.
     urlpatterns = [
         url(r'^', include(router.urls)),
-        url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     ]
 ```
 用router註冊viewsets和提供一個urlpattern很像。我們有兩個參數——給views的URL前綴和viewset自身。

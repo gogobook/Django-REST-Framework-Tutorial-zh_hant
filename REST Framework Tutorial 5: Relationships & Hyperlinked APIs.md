@@ -71,7 +71,7 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 `HyperlinkedModelSerializer` 與 `ModelSerializer` 有如下的區別:
 
-    * 預設狀態下不包含 `pk` 欄位；
+    * 預設狀態下不包含 `id` 欄位；
     * 具有一個`url` 欄位，即`HyperlinkedIdentityField`類型.
     * 用`HyperlinkedRelatedField`表示關係，而非`PrimaryKeyRelatedField`.
 
@@ -145,7 +145,10 @@ REST framework支持所有這些方式，包括正向或者反向的關係，或
 
 通過在`settings.py` 中添加如下配置，我們就能在結果列表中增加分頁的功能:
 
-    REST_FRAMEWORK ={'PAGE_SIZE':10}
+    REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 請注意REST framework的所有配置信息都是存放在一個叫做 'REST_FRAMEWORK'的dictionary中，以便於其他配置區分。
 
