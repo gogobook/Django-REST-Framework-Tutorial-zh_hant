@@ -37,11 +37,13 @@ class UserViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 ```
 If we need to, we can bind this viewset into two separate views, like so:
+假如我們需要，我們可以連結這個viewset到二個不同的視圖，就像這樣。
 ```py
 user_list = UserViewSet.as_view({'get': 'list'})
 user_detail = UserViewSet.as_view({'get': 'retrieve'})
 ```
 Typically we wouldn't do this, but would instead register the viewset with a router, and allow the urlconf to be automatically generated.
+通常我們不需要這麼做，而是用一個router 註冊這個viewset，以允許urlconf被自動地的產生。
 ```py
 from myapp.views import UserViewSet
 from rest_framework.routers import DefaultRouter
@@ -68,6 +70,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 ### ViewSet actions
 The default routers included with REST framework will provide routes for a standard set of create/retrieve/update/destroy style actions, as shown below:
+
 ```py
 class UserViewSet(viewsets.ViewSet):
     """

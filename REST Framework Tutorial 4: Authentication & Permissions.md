@@ -173,6 +173,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
     class IsOwnerOrReadOnly(permissions.BasePermission):
         """
         Custom permission to only allow owners of an object to edit it.
+        然後我們用繼承permissions.BasePermission 來做一個自定義權限。
         """
 
         def has_object_permission(self, request, view, obj):
