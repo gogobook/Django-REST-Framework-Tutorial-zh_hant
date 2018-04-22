@@ -5,13 +5,13 @@
 
 - Jacob Kaplan-Moss
 
-REST framwork包含一些擴展自Django現有測試框架的助手類，並改進對API請求的支持。
+REST framwork包含一些擴展自Django現有測試框架的助手類，並改進對API requests 的支持。
 
 ## APIRequestFactory
-擴展了Django的現有RequestFactory類。
+擴展了[Django的現有`RequestFactory`類](https://docs.djangoproject.com/en/2.0/topics/testing/advanced/#django.test.client.RequestFactory)。
 
 ### 創建測試請求
-本APIRequestFactory類支持幾乎相同的API來Django的標準RequestFactory類。這意味著，標準.get()，.post()，.put()，.patch()，.delete()，.head()和.options()方法都是可用的。
+本`APIRequestFactory`類支持幾乎相同的API來Django的標準RequestFactory類。這意味著，標準.get()，.post()，.put()，.patch()，.delete()，.head()和.options()方法都是可用的。
 ```py
 from rest_framework.test import APIRequestFactory
 
@@ -159,7 +159,7 @@ client.force_authenticate(user=user)
 像往常一樣，CSRF驗證將僅適用於任何會話驗證視圖。這意味著CSRF驗證只有在客戶端通過調用`login()`登錄後才會發生。
 
 ## RequestsClient
-REST framwork還包含一個客戶端，用於使用流行的Python庫`requests`與您的應用程序進行交互。這可能是有用的，如果：
+REST framework還包含一個客戶端，用於使用流行的Python庫`requests`與您的應用程序進行交互。這可能是有用的，如果：
 
 - 您期望主要從另一個Python服務與API進行交互，並且希望在與客戶端相同的級別測試該服務。
 - 您希望以這樣的方式編寫測試，以便它們也可以在分段或實時環境中運行。（請參閱下面的“實時測試”。）

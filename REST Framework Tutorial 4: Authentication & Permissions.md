@@ -37,8 +37,8 @@
         representation of the code snippet.
         """
         lexer = get_lexer_by_name(self.language)
-        linenos = self.linenos and 'table' or False
-        options = self.title and {'title': self.title} or {}
+        linenos = 'table' if self.linenos else False
+        options = {'title': self.title} if self.title else {}
         formatter = HtmlFormatter(style=self.style, linenos=linenos,
                                 full=True, **options)
         self.highlighted = highlight(self.code, lexer, formatter)
@@ -99,7 +99,7 @@ from django.contrib.auth.models import User
 
 現在，如果我們創建一個code snippet(物件)，還沒有方法可關連到其創建者。User並沒有作為序列化呈現型的一部分發送，而是作為incoming request的一個property。
 
-這裡的處理方法是overriding(重載)snippet view中的 .preform_create() (這裡有改過，之前是.pre\_save())方法，以使實例物件的儲存可被管理，並且可以讓我們處理傳入的request或requested URL中隱式的信息。
+這裡的處理方法是overriding(重載)snippet view中的 `.preform_create()` (這裡有改過，之前是`.pre_save()`)方法，以使實例物件的儲存可被管理，並且可以讓我們處理傳入的request或requested URL中隱式的信息。
 
 在 `SnippetList`的view類中，添加如下的方法：
 
@@ -148,8 +148,7 @@ REST framework 包括許多權限類可用於view的控制。這裡我們使用 
 ```python
 
     urlpatterns += [
-    url(r'^api-auth/', include('rest_framework.urls',
-                               namespace='rest_framework')),
+    url(r'^api-auth/', include('rest_framework.urls')),
     ]
 ```
 具體的， `r'^api-auth/'` 部分可以用任何你想用的URL來替代。這裡唯一的限制就是 urls 必須使用`'rest_framework'` 命名空間。
