@@ -5,7 +5,7 @@
 在之前基於函數的View之外，我們還可以用基於類的view來實現我們的API view。正如我們即將看到的那樣，這樣的方式可以讓我們重用公用功能，並使我們保持代碼DRY。
 
 ## 1.用基於類的view重寫我們的API 
-我們要用基於類的view來重寫剛才的`view.py`，如下重構所示：
+我們要用基於類的view來重寫剛才的`views.py`，如下重構所示：
 
 ```python
     from snippets.models import Snippet
@@ -64,10 +64,10 @@
 ```
 做的不錯。它和我們之前寫的基於函數的view還是有些相像。
 
-我們還需要對urls.py做一些小小的改動：
+我們還需要對`snippets/urls.py`做一些小小的改動：
 
 ```python
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from rest_framework.urlpatterns import format_suffix_patterns
     from snippets import views
 
@@ -86,7 +86,7 @@ urlpatterns = format_suffix_patterns(urlpatterns)
 
 目前我們用到的`create/retrieve/update/delete`操作，與我們建立的任何的模型後端API view都會很類似。其中的公共行為的一部分在REST framework's mixin類中實作。
 
-我們來看看，我們如何在views.py中使用mixin類：
+我們來看看，我們如何在`views.py`中使用mixin類：
 
 ```python
     from snippets.models import Snippet

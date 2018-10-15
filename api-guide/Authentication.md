@@ -1,7 +1,7 @@
-認證是一個關連一套識別憑證與連入request的機制，例如當使用者request所帶，或令符所簽用。權限與限制策略然後使用這些憑證來決定request是否被允許。
-REST framework 提供一些即可用的認證綱要，並允許你實作自訂綱要。
+身份驗證是將傳入請求與一組標識憑據（例如請求來自的用戶或其簽名的令牌）相關聯的機制。然後，權限和限制策略可以使用這些憑據來確定是否應該允許該請求。
+REST框架提供了許多開箱即用的身份驗證方案，還允許您實現自定義方案。
 認證總是在view最開始的時候執行，在permission與throttling check發生之前，並在任何程式碼被允許處理之前。
-`request.user` property 通常被設定給`contrib.auth` package's `User` class的實例。
+`request.user` property 通常被設定為`contrib.auth` package's `User` class的實例。
 `request.auth` property 通常作為任何額外的認證資訊，例如它可能用來呈現由request 所簽認的一個認證令符。
 
 **注意:** 別忘了，認證本身並不能阻止一個連入request，它只是簡單的識別request的憑證。
@@ -59,12 +59,12 @@ def example_view(request, format=None):
     return Response(content)
 ```
 ## 未認證及回應禁止
-When an unauthenticated request is denied permission there are two different error codes that may be appropriate.
+當未經身份驗證的請求被拒絕時，有兩個不同的錯誤代碼可能是合適的。
 
     * HTTP 401 Unauthorized
     * HTTP 403 Permission Denied
 
-HTTP 401 responses must always include a `WWW-Authenticate` header, that instructs the client how to authenticate. HTTP 403 responses do not include the `WWW-Authenticate` header.
+HTTP 401響應必須始終包含一個WWW-Authenticate標頭，指示客戶端如何進行身份驗證。HTTP 403響應不包括WWW-Authenticate標頭。
 
 The kind of response that will be used depends on the authentication scheme. Although multiple authentication schemes may be in use, only one scheme may be used to determine the type of response. **The first authentication class set on the view is used when determining the type of response.**
 

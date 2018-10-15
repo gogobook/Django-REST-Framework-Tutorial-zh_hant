@@ -1,0 +1,137 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    var csrfToken = "Qw0hVuPnnXG5r5ziAZT1RpKp1zJKlyWislVPTGbb";
+            window.Vue = Vue;
+            Vue.http.interceptors.push(function (request, next) {
+                request.headers['X-CSRF-TOKEN'] = csrfToken;
+                next();
+            });
+            Vue.http.headers.common['X-CSRF-TOKEN'] = csrfToken;
+        </script>
+  <link type="text/css" rel="stylesheet" href="http://cryptoflip.dev:8000/css/stylesheet.css" />
+</head>
+
+<body>
+  <div class="mainheader">
+    <div class="subcontainer-left">
+      <div class="subcontainter-title"><a href="/" style="text-decoration:none;color:inherit"> &nbsp; Cryptoflip</a></div>
+      <div class="subcontainer-button">
+        <a href="/user/Ace">Your Profile</a>
+      </div>
+      <div class="subcontainer-button">
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+    <div class="subcontainer-right noselect">
+      <div class="subcontainer-button">
+        <a href="/support">Support</a>
+      </div>
+      <div class="subcontainer-button">
+        <a>Provably Fair</a>
+      </div>
+      <div class="subcontainer-button">
+        <a href="/dice">Dice</a>
+      </div>
+      <div class="subcontainer-button">
+        <a href="/">Coinflip</a>
+      </div>
+    </div>
+  </div>
+  <!-- Decoration -->
+  <!--<div style="height: 10px; width: 200px; margin: auto; margin-top: -50px; background-color: gold"></div>-->
+  </div>
+  <div class="maincontainer">
+    <div id="app">
+      <div align="center">
+        <div v-show="player2_ready === false">Waiting for player2 to be ready</div>
+        <img src="http://cryptoflip.dev:8000/img/coinflip/USD_4.gif" style="height:250px">
+        <p><strong>Countdown</strong> {{countdowncounter}}</p>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.0.3/vue-resource.js"></script>
+    <script>
+      var vm = new Vue({
+        el: '#app',
+        data: function () {
+          return {
+            ready: null,
+            result: 0,
+            countdowncounter: 3,
+            Id: null,
+            gId: null,
+            player2_ready: false,
+            img_src: '../../public/img/coinflip/BTC_1.gif',
+            gameid: 4
+          }
+        },
+        methods: {
+          loadGame: function () {
+            // process coinflip upon ready game
+            var result = Math.floor((Math.random() * 2) + 1);
+            this.result = result;
+            clearInterval(this.gId);
+            // wait for game to be ready
+          },
+          countdown: function () {
+            console.log('test');
+            // check to see if player2 is ready is ready
+            var self = this;
+            this.$http.get('/api/games/ready/' + this.gameid).then(function (response) {
+              if (parseInt(response.body)) { // player2 is ready
+                // get opponent from API
+                self.countdowncounter = self.countdowncounter - 1;
+                if (self.countdowncounter == 0) {
+                  self.loadGame();
+                  clearTimeout(this.tId)
+                }
+              } else {
+                // check if user is player2
+                // game is joinable update the database
+                // get players id
+                var obj = self;
+                self.$http.get('/api/userid').then(function (userid) {
+                  // update database
+                  console.log(userid);
+                  var formData = new FormData();
+                  formData.append('player2', userid);
+                  formData.append('player2_ready', 1);
+                  obj.$http.post('/api/updateready/' + this.gameid,
+                    formData);
+                  obj.player2_ready = true;
+                  console.log(obj.player2_ready);
+                });
+
+              }
+
+
+            });
+
+          },
+          play: function () {
+            var self = this;
+
+
+            //  this.tId = setInterval(function () {
+            self.countdown();
+            ///}, 1000);
+          }
+        },
+        mounted: function () {
+          console.log('This works');
+          var self = this;
+          this.$nextTick(function () {
+            self.play();
+          });
+        }
+      });
+    </script>
+  </div>
+</body>
+
+</html>
+```

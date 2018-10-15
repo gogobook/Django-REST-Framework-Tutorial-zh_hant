@@ -1,18 +1,18 @@
 # 過濾
-> Manager提供的根QuerySet描述數據庫表中的所有對象。但是，通常情況下，您只需要選擇完整對象集的一部分。
+> Manager提供的根QuerySet描述資料庫表中的所有物件。但是，通常情況下，您只需要選擇完整物件集的一部分。
 
 > - Django文檔
 
-REST Framework的通用列表視圖的默認行為是返回模型管理器(model manager)的整個查詢集。通常您會希望您的API限制查詢集返回的項目。
+REST Framework的通用列表視圖的預設行為是返回模型管理器(model manager)的整個查詢集。通常您會希望您的API限制查詢集返回的項目。
 
-過濾任何視圖的子集的查詢集的最簡單方法GenericAPIView是重寫該.get_queryset()方法。
+過濾任何視圖的查詢集的最簡單方法是子類化`GenericAPIView`以覆寫其`.get_queryset()`方法。
 
-重寫此方法允許您以多種不同方式自定義視圖返回的查詢集。
+覆寫此方法允許您以多種不同方式自定義視圖返回的查詢集。
 
 ### 針對當前用戶進行過濾
 您可能需要過濾查詢集以確保只返回與當前經過身份驗證的用戶發出請求相關的結果。
 
-您可以通過基於`request.user`值進行篩選來完成此操作。
+您可以通過基於值為`request.user`來進行篩選以完成此操作。
 
 例如：
 ``` py
@@ -77,13 +77,13 @@ class PurchaseList(generics.ListAPIView):
 過濾示例
 
 ### 設置過濾器後端
-可以使用該`DEFAULT_FILTER_BACKENDS`設置全局設置默認的過濾器後端。例如。
+可以使用該`DEFAULT_FILTER_BACKENDS`設置全局設置預設的過濾器後端。例如。
 ```py
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
 ```
-您還可以使用GenericAPIView基於類的視圖，在每個視圖或每個視圖的基礎上設置過濾器後端。
+您還可以使用`GenericAPIView`基於類的視圖，在每個視圖或每個視圖的基礎上設置過濾器後端。
 ```py
 import django_filters.rest_framework
 from django.contrib.auth.models import User
@@ -95,10 +95,10 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
 ```
-### 過濾和對象查找
-請注意，如果為視圖配置了過濾器後端，那麼以及用於過濾列表視圖的過濾器後端也將用於過濾用於返回單個對象的查詢集。
+### 過濾和物件查找
+請注意，如果為視圖配置了過濾器後端，那麼以及用於過濾列表視圖的過濾器後端也將用於過濾用於返回單個物件的查詢集。
 
-例如，在前面的示例中，以及具有id的產品4675，以下URL將返回相應的對象，或返回404響應，具體取決於給定產品實例是否滿足過濾條件：
+例如，在前面的示例中，以及具有id的產品4675，以下URL將返回相應的物件，或返回404響應，具體取決於給定產品實例是否滿足過濾條件：
 
 `http://example.com/api/products/4675/?category=clothing&max_price=10.00`
 ### 覆蓋最初的查詢集
@@ -172,7 +172,7 @@ class UserListView(generics.ListAPIView):
 您還可以使用查找API雙下劃線表示法對ForeignKey或ManyToManyField執行相關查找：
 
 search_fields = ('username', 'email', 'profile__profession')
-默認情況下，搜索將使用不區分大小寫的部分匹配。搜索參數可能包含多個搜索詞，它們應該是空格和/或逗號分隔的。如果使用多個搜索條件，則只有在所有提供的條件匹配的情況下，對象才會返回到列表中。
+預設情況下，搜索將使用不區分大小寫的部分匹配。搜索參數可能包含多個搜索詞，它們應該是空格和/或逗號分隔的。如果使用多個搜索條件，則只有在所有提供的條件匹配的情況下，物件才會返回到列表中。
 
 搜索行為可能受到各種字符預先限制search_fields。
 
@@ -183,18 +183,18 @@ search_fields = ('username', 'email', 'profile__profession')
 例如：
 
 `search_fields = ('=username', '=email')`
-默認情況下，搜索參數名為'search'，但可能會被SEARCH_PARAM設置覆蓋。
+預設情況下，搜索參數名為'search'，但可能會被SEARCH_PARAM設置覆蓋。
 
 有關更多詳細信息，請參閱Django文檔。
 
 ### OrderingFilter
-本OrderingFilter類支持控制結果的排序簡單的查詢參數。
+本`OrderingFilter`類支持控制結果的排序簡單的查詢參數。
 
-訂購過濾器
+排序過濾器
 
-默認情況下，查詢參數是命名的'ordering'，但這可能會被ORDERING_PARAM設置覆蓋。
+預設情況下，查詢參數是命名的`'ordering'`，但這可能會被ORDERING_PARAM設置覆蓋。
 
-例如，要通過用戶名來訂購用戶：
+例如，要通過用戶名來排序用戶：
 
 http://example.com/api/users?ordering=username
 客戶端也可以通過在字段名稱前加' - '來指定反向排序，如下所示：
@@ -203,8 +203,9 @@ http://example.com/api/users?ordering=-username
 也可以指定多個訂單：
 
 http://example.com/api/users?ordering=account,username
+
 #### 指定可以針對哪些字段進行排序
-建議您明確指定API應允許在排序過濾器中使用哪些字段。您可以通過ordering_fields在視圖上設置屬性來完成此操作，如下所示：
+建議您明確指定API應允許在排序過濾器中使用哪些字段。您可以通過`ordering_fields`在視圖上設置屬性來完成此操作，如下所示：
 ```py
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
@@ -214,9 +215,9 @@ class UserListView(generics.ListAPIView):
 ```
 這有助於防止意外的數據洩漏，例如允許用戶針對密碼哈希字段或其他敏感數據進行訂購。
 
-如果您未ordering_fields在視圖上指定屬性，那麼過濾器類將默認允許用戶過濾serializer_class屬性指定的序列化程序中的任何可讀字段。
+如果您未`ordering_fields`在視圖上指定屬性，那麼過濾器類將預設允許用戶過濾`serializer_class`屬性指定的序列化程序中的任何可讀字段。
 
-如果您確信視圖使用的查詢集不包含任何敏感數據，則還可以通過使用特殊值明確指定視圖應允許在任何模型字段或查詢集合上進行排序'__all__'。
+如果您確信視圖使用的查詢集不包含任何敏感數據，則還可以通過使用特殊值明確指定視圖應允許在任何模型字段或查詢集合上進行排序`'__all__'`。
 ```py
 class BookingsListView(generics.ListAPIView):
     queryset = Booking.objects.all()
@@ -224,8 +225,8 @@ class BookingsListView(generics.ListAPIView):
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = '__all__'
 ```
-#### 指定默認順序
-如果ordering視圖上設置了屬性，則將用作默認排序。
+#### 指定預設順序
+如果`ordering`視圖上設置了屬性，則將用作預設排序。
 
 通常情況下，您應該通過設置order_by初始查詢集來控制此操作，但ordering在視圖上使用參數允許您指定排序，然後可以將其作為上下文自動傳遞到呈現的模板。這可以自動呈現列標題，如果它們用於排序結果。
 ```py
@@ -236,12 +237,12 @@ class UserListView(generics.ListAPIView):
     ordering_fields = ('username', 'email')
     ordering = ('username',)
 ```
-該ordering屬性可以是字符串的字符串或列表/元組。
+該`ordering`屬性可以是字符串的字符串或列表/元組。
 
 ### DjangoObjectPermissionsFilter
-該軟件DjangoObjectPermissionsFilter旨在與django-guardian軟件包一起使用，並'view'添加了自定義權限。過濾器將確保查詢集僅返回用戶具有適當查看權限的對象。
+該軟件`DjangoObjectPermissionsFilter`旨在與django-guardian軟件包一起使用，並`'view'`添加了自定義權限。過濾器將確保查詢集僅返回用戶具有適當查看權限的物件。
 
-如果您正在使用DjangoObjectPermissionsFilter，您可能還需要添加適當的對象權限類，以確保用戶只能在具有適當對象權限的實例上進行操作。做到這一點的最簡單方法是對屬性進行子類化DjangoObjectPermissions和添加'view'權限perms_map。
+如果您正在使用`DjangoObjectPermissionsFilter`，您可能還需要添加適當的物件權限類，以確保用戶只能在具有適當物件權限的實例上進行操作。做到這一點的最簡單方法是對屬性進行子類化DjangoObjectPermissions和添加'view'權限`perms_map`。
 
 一個完整的例子使用兩者DjangoObjectPermissionsFilter，DjangoObjectPermissions可能看起來像這樣。
 
@@ -279,12 +280,12 @@ class EventViewSet(viewsets.ModelViewSet):
 ### 自定義通用篩選
 您還可以提供自己的通用過濾後端，或者編寫一個可供其他開發人員使用的可安裝應用程序。
 
-這樣做覆蓋BaseFilterBackend，並覆蓋該.filter_queryset(self, request, queryset, view)方法。該方法應該返回一個新的，過濾的查詢集。
+這樣做覆蓋`BaseFilterBackend`，並覆蓋該`.filter_queryset(self, request, queryset, view)`方法。該方法應該返回一個新的，過濾的查詢集。
 
-除了允許客戶端執行搜索和過濾外，通用過濾器後端可用於限制哪些對象應該對任何給定的請求或用戶可見。
+除了允許客戶端執行搜索和過濾外，通用過濾器後端可用於限制哪些物件應該對任何給定的請求或用戶可見。
 
 #### 例
-例如，您可能需要限制用戶只能看到他們創建的對象。
+例如，您可能需要限制用戶只能看到他們創建的物件。
 ```py
 class IsOwnerFilterBackend(filters.BaseFilterBackend):
     """
@@ -303,7 +304,7 @@ class IsOwnerFilterBackend(filters.BaseFilterBackend):
 該方法應該返回一個呈現的HTML字符串。
 
 #### 分頁和模式
-通過實現一個get_schema_fields()方法，您還可以使過濾器控件可用於REST Framework提供的模式自動生成。此方法應具有以下簽名：
+通過實現一個`get_schema_fields()`方法，您還可以使過濾器控件可用於REST Framework提供的模式自動生成。此方法應具有以下簽名：
 
 `get_schema_fields(self, view)`
 
@@ -322,4 +323,4 @@ class IsOwnerFilterBackend(filters.BaseFilterBackend):
 `django-url-filter`提供了一種安全的方式來通過人性化網址過濾數據。它與DRF序列化器和字段非常相似，因為它們可以嵌套，除了它們被稱為過濾器和過濾器。這為過濾相關數據提供了簡便的方法。此外，這個庫是通用的，所以它可以用來過濾其他數據源，而不僅僅是Django QuerySet。
 
 #### drf-url-filters
-`drf-url-filters`是一個簡單的Django應用程序適用於DRF過濾器ModelViewSet的Queryset一個清潔，簡單和可配置的方式。它還支持傳入查詢參數及其值的驗證。一個漂亮的python包Voluptuous正用於傳入查詢參數的驗證。關於性感的最好的部分是你可以根據你的查詢參數要求定義你自己的驗證。
+`drf-url-filters`是一個簡單的Django應用程序適用於DRF過濾器ModelViewSet的Queryset一個清楚，簡單和可配置的方式。它還支持傳入查詢參數及其值的驗證。一個漂亮的python包Voluptuous正用於傳入查詢參數的驗證。關於性感的最好的部分是你可以根據你的查詢參數要求定義你自己的驗證。
