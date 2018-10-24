@@ -1,19 +1,20 @@
 # ViewSets
 
-在路由確定了要用於請求的控制器後，您的控制器負責理解請求並生成適當的輸出。
+> 在路由確定了要用於請求的控制器後，您的控制器負責理解請求並生成適當的輸出。
 
 - Ruby on Rails文檔。
 
 Django REST framwork允許您將一組相關視圖的邏輯組合在一個類中，稱為ViewSet。在其他框架中，您可能會發現概念上類似的實現，命名為「資源」或「控制器」。
 
-ViewSet類只是一種基於類的視圖，它不提供任何方法處理程序，例如.get()或.post()，而是提供諸如.list()和.create()之類的操作。
+`ViewSet`類只是一種基於類的視圖，它不提供任何方法處理程序，例如`.get()`或`.post()`，而是提供諸如`.list()`和`.create()`之類的動作(action)。
 
 ViewSet的方法處理程序僅在使用.as_view()方法最後確定視圖的時候綁定到相應的操作。
 
-通常，您不會在urlconf的viewset中顯式地註冊視圖，而是使用一個路由器類註冊viewset，它會自動地為您確定urlconf。
+通常，您不會在urlconf的viewset中顯式地註冊視圖，而是使用一個路由器類註冊viewset，它會自動地為您決定urlconf。
 
 ### Example
 讓我們定義一個簡單的viewset，它可以用於列表或檢索系統中的所有用戶。
+
 ```py
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
@@ -53,6 +54,8 @@ router.register(r'users', UserViewSet, base_name='user')
 urlpatterns = router.urls
 ```
 Rather than writing your own viewsets, you'll often want to use the existing base classes that provide a default set of behavior. For example:
+相對於撰寫你自己的viewsets, 你通常想要使用既有的基礎類別以提供一組預設的行為，例如。
+
 ```py
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -70,7 +73,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 ### ViewSet actions
 The default routers included with REST framework will provide routes for a standard set of create/retrieve/update/destroy style actions, as shown below:
-
+REST framework 所帶有的預設路由器將為create/retrieve/update/destroy style actions 的標準組合提供路由，如下所示。
 ```py
 class UserViewSet(viewsets.ViewSet):
     """
@@ -100,13 +103,19 @@ class UserViewSet(viewsets.ViewSet):
         pass
 ```
 ### Introspecting ViewSet actions
+### 查看 ViewSet actions
+
 During dispatch, the following attributes are available on the ViewSet.
+當在分派時，下列屬性將可用於ViewSet
 
 - basename - the base to use for the URL names that are created.
 - action - the name of the current action (e.g., list, create).
 - detail - boolean indicating if the current action is configured for a list or detail view.
 - suffix - the display suffix for the viewset type - mirrors the detail attribute.
+- name - the display name for the viewset. This argument is mutually exclusive to suffix.
+- description - the display description for the individual view of a viewset.
 You may inspect these attributes to adjust behaviour based on the current action. For example, you could restrict permissions to everything except the list action similar to this:
+你可以在現有action 上查看這些屬性以調整行為，例如 你可對所有東西限制權限除了列表 action，相似如下。
 
 ```py
 def get_permissions(self):
@@ -120,7 +129,7 @@ def get_permissions(self):
     return [permission() for permission in permission_classes]
 ```
 ### Marking extra actions for routing
-如果您有可以路由的特別方法，您可以將它們標記為`@action` decorator。與常規action一樣，可以為物件列表或單個實例指定額外的操作。為了表示這一點，將`detail`參數設置為`True`或`False`。路由器將相應地配置它的URL模式。例如，`DefaultRouter`將配置細節操作以在其URL模式中包含pk。
+如果您有可以路由的特別方法，您可以將它們標記為`@action` decorator。與常規action一樣，可以為物件列表或單個實例指定額外的操作。為了表示這一點，將`detail`參數設置為`True`或`False`。路由器將相應地配置它的URL模式。例如，`DefaultRouter`將配置細節操作以在其URL模式中包含`pk`。
 A more complete example of extra actions:
 ```py
 from django.contrib.auth.models import User
@@ -161,6 +170,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 ```
 The decorator can additionally take extra arguments that will be set for the routed view only. For example:
+裝飾器可取得額外的參數，這僅可被routed view 所設定。例如
 ```py
     @action(methods=['post'], detail=True, permission_classes=[IsAdminOrIsSelf])
     def set_password(self, request, pk=None):
@@ -180,20 +190,20 @@ To view all extra actions, call the `.get_extra_actions()` method.
 ### ViewSet
 `ViewSet`類繼承自`APIView`。您可以使用任何標準屬性，如`permission_classes`、`authentication_classes`來控制viewset中的API策略。
 
-`ViewSet`類不提供任何操作的實現。為了使用ViewSet類，您將重寫類並顯式地定義操作實現。
+`ViewSet`類不提供任何action的實作。為了使用ViewSet類，您將重寫類並顯式地定義action實作。
 
 ### GenericViewSet
 `GenericViewSet`類繼承了`GenericAPIView`，並提供了預設的`get_object`、`get_queryset`方法和其他通用視圖基本行為，但不包括任何預設的操作。
 
-為了使用`GenericViewSet`類，您將重寫類，或者在需要的mixin類中使用mixin，或者顯式地定義操作實現。
+為了使用`GenericViewSet`類，您將重寫類，或者在需要的mixin類中使用mixin，或者顯式地定義action實作。
 
 ### ModelViewSet
-`ModelViewSet`類繼承了`GenericAPIView`，并包含了各種操作的實現，混合了各種mixin類的行為。
+`ModelViewSet`類繼承了`GenericAPIView`，並包含了各種操作的實現，混合了各種mixin類的行為。
 
 `ModelViewSet`類提供的操作是`.list()`， `.retrieve()`， `.create()`， `.update()`， `.partial_update()`和`.destroy()`。
 
-例子
-因為ModelViewSet擴展了GenericAPIView，所以通常需要至少提供queryset和serializer_class屬性。例如:
+#### 例子
+因為`ModelViewSet`擴展了`GenericAPIView`，所以通常需要至少提供`queryset`和`serializer_class`屬性。例如:
 ```py
 class AccountViewSet(viewsets.ModelViewSet):
     """
@@ -203,7 +213,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
     permission_classes = [IsAccountAdminOrReadOnly]
 ```
-注意，您可以使用GenericAPIView提供的任何標準屬性或方法重寫。例如，要使用一個動態地確定它應該運行的queryset的視圖集，您可以這樣做:
+注意，您可以使用`GenericAPIView`提供的任何標準屬性或方法重寫。例如，要使用一個動態地確定它應該運行的`queryset`的`viewSet`，您可以這樣做:
 ```py
 class AccountViewSet(viewsets.ModelViewSet):
     """
@@ -216,14 +226,14 @@ class AccountViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.request.user.accounts.all()
 ```
-注意，如果從您的ViewSet中刪除了queryset屬性，任何關聯的路由器將無法自動派生您的模型的base_name，因此您將不得不指定base_name kwarg作為路由器註冊的一部分。
+注意，如果從您的`ViewSet`中刪除了`queryset`屬性，任何關聯的路由器將無法自動派生您的模型的`basename`，因此您將不得不指定`basename` kwarg作為路由器註冊的一部分。
 
-還要注意,雖然這類提供了全套的創建/清單/檢索/更新/破壞行動在預設情況下,您可以通過使用標準的限制可用操作許可類。
+還要注意,雖然這類提供了全套的create/list/retrieve/update/destroy actions 在預設情況下,您可以通過使用標準的限制可用操作許可類。
 
 ### ReadOnlyModelViewSet
 `ReadOnlyModelViewSet`類也繼承了`GenericAPIView`。與`ModelViewSet`一樣，它還包括各種操作的實現，但與`ModelViewSet`不同的是，它只提供「只讀」操作、`.list()`和`.retrieve()`。
 
-例子
+#### 例子
 與ModelViewSet一樣，您通常需要至少提供`queryset`和`serializer_class`屬性。例如:
 ```py
 class AccountViewSet(viewsets.ReadOnlyModelViewSet):
@@ -239,7 +249,7 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
 您可能需要提供定製的`ViewSet`類，這些類沒有完整的`ModelViewSet`操作集，或者以其他方式定製該行為。
 
 ### 例子
-要創建提供創建、列表和檢索操作的基本視圖集類，從GenericViewSet繼承，並混合所需的操作:
+要創建提供創建、列表和檢索操作的基本`ViewSet`類，從GenericViewSet繼承，並混合所需的操作:
 ```py
 from rest_framework import mixins
 
@@ -255,4 +265,4 @@ class CreateListRetrieveViewSet(mixins.CreateModelMixin,
     """
     pass
 ```
-通過創建您自己的基本視圖集類，您可以提供可以在您的API上的多個ViewSet中重用的公共行為。
+通過創建您自己的基本`ViewSet`類，您可以提供可以在您的API上的多個ViewSet中重用的公共行為。
