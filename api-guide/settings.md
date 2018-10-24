@@ -215,7 +215,7 @@ URL conf中可用於提供格式後綴的參數名稱。此設置適用於使用
 默認： 'iso-8601'
 
 #### DATETIME_INPUT_FORMATS
-默認情況下用於解析DateTimeField串行器字段輸入的格式字符串列表。
+默認情況下用於解析DateTimeField序列化器字段輸入的格式字符串列表。
 
 可能是包含字符串'iso-8601'或Python strftime格式字符串的列表。
 
@@ -229,7 +229,7 @@ URL conf中可用於提供格式後綴的參數名稱。此設置適用於使用
 默認： 'iso-8601'
 
 #### DATE_INPUT_FORMATS
-默認情況下用於解析DateField串行器字段輸入的格式字符串列表。
+默認情況下用於解析DateField序列化器字段輸入的格式字符串列表。
 
 可能是包含字符串'iso-8601'或Python strftime格式字符串的列表。
 
@@ -243,7 +243,7 @@ URL conf中可用於提供格式後綴的參數名稱。此設置適用於使用
 默認： 'iso-8601'
 
 #### TIME_INPUT_FORMATS
-默認情況下用於解析TimeField串行器字段輸入的格式字符串列表。
+默認情況下用於解析TimeField序列化器字段輸入的格式字符串列表。
 
 可能是包含字符串'iso-8601'或Python strftime格式字符串的列表。
 

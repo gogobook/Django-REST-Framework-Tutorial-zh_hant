@@ -87,7 +87,7 @@
 ## 4. 創建序列化類
 
 我們要使用我們的web api，要做的第一件事就是提供snippets實例序列化和反序列化的方法， 以使snippets實例能轉換為可表述的內容，例如`json`.
-我們宣告一個串行器serializer，該串行器與django 的表單形式很類似。在snippets目錄下面，創建一個`serializers.py` ，並將下面內容拷貝到文件中。
+我們宣告一個序列化器serializer，該序列化器與django 的表單形式很類似。在snippets目錄下面，創建一個`serializers.py` ，並將下面內容拷貝到文件中。
 
     from rest_framework import serializers
     from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES

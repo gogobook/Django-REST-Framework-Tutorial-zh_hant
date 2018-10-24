@@ -26,7 +26,7 @@
     from pygments.formatters.html import HtmlFormatter
     from pygments import highlight
     
-我們現在為模型增加一個 `.save() `方法：
+我們現在為`Snippet`模型增加一個 `.save() `方法：
 - `# models.py中只有一個class Snippet(model.Model):` 
 - `# 因為要進行語法高亮化之後的儲存動作，所以需要一個額外的def save`
 
@@ -58,8 +58,6 @@
 ## 2. 為用戶模型增加endpoints
 
 現在我們需要一些用戶，我們最好把用戶呈現型也增加到API上，創建一個新的serializer很容易，在`serializers.py`加入以下程式碼： `#這個User是系統預設的，所以models.py內沒有`
-
-
 
 ```python
     from django.contrib.auth.models import User
