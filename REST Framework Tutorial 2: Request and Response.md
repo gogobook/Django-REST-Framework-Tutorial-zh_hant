@@ -26,8 +26,8 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
 
 在編寫API views時，REST Framework提供了兩種wrappers：
 
-1. The `@api_viwe` decorator for working with function based views.
-2. The `APIView` class for working with class based views.
+1. The `@api_viwe` decorator for working with **function based views**.
+2. The `APIView` class for working with **class based views**.
 
 這兩種包裝器提供了許多功能，例如，確保在view當中能夠接收到`Request`實例；往`Response`中增加內容以便內容協商(content negotiation) 機制能夠執行。
 
@@ -38,7 +38,7 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
 我們開始用這些新的組件來寫一些views。
 
 我們不再需要`views.py`中的`JESONResponse` 類（在前一篇中`view.py`中創建，它的作用就是做為一個包裝器，將json資料進行包裝），將它刪除。刪除後我們開始稍微重構下我們的view
-
+```py
     from rest_framework import status
     from rest_framework.decorators import api_view
     from rest_framework.response import Response
@@ -61,9 +61,9 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+```
 上面的代碼是對我們之前代碼的改進。看上去更簡潔，也更類似於django的forms api形式。我們也採用了狀態碼，使返回值更加明確。 下面是對單個snippet操作的view更新：
-
+```py
     @api_view(['GET', 'PUT', 'DELETE'])
     def snippet_detail(request, pk):
         """
@@ -88,7 +88,7 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
         elif request.method == 'DELETE':
             snippet.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
+```
 這應感覺非常熟悉，這與一般的Django views並不會差很多。
 
 注意，我們不在有沒有明確的要求requests或者responses給出content type。`request.data`可以處理輸入的`json` requests，也可以輸入yaml和其他格式。

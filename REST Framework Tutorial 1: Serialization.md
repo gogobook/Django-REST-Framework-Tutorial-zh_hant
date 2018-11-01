@@ -55,7 +55,7 @@
 ## 3. 創建Model
 
 這裡我們創建一個簡單的snippets model，目的是用來存儲代碼片段。
-
+```py
     from django.db import models
     from pygments.lexers import get_all_lexers
     from pygments.styles import get_all_styles
@@ -78,7 +78,7 @@
 
         class Meta:
             ordering = ('created',)
-
+```
 完成model時，記得sync下資料庫
 
     python manage.py makemigrations snippets
@@ -88,7 +88,7 @@
 
 我們要使用我們的web api，要做的第一件事就是提供snippets實例序列化和反序列化的方法， 以使snippets實例能轉換為可表述的內容，例如`json`.
 我們宣告一個序列化器serializer，該序列化器與django 的表單形式很類似。在snippets目錄下面，創建一個`serializers.py` ，並將下面內容拷貝到文件中。
-
+```py
     from rest_framework import serializers
     from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
@@ -120,7 +120,7 @@
             instance.style = validated_data.get('style', instance.style)
             instance.save()
             return instance
-
+```
             
             
 該序列化類的前面部分，定義了要序列化和反序列化的欄位(字段)(所以都是serializaers.什麼什麼)。
@@ -252,7 +252,7 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
     from snippets.serializers import SnippetSerializer
 
 我們API的目的是，可以通過view來列舉全部的Snippet的內容，或者創建一個新的snippet
-
+```py
     @csrf_exempt
     def snippet_list(request):
         """
@@ -271,12 +271,12 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
                 return JsonResponse(serializer.data, status=201)
             else:
                 return JsonResponse(serializer.errors, status=400)
-
+```
 注意，因為我們要能夠自client向該view 丟一個`Post`請求，所以我們要將該view 標註為csrf_exempt, 以說明不是一個CSRF事件。
 這並不是一個正常你想要做的事，且**REST framework** view事實上使用一個比csrf token更靈敏的行為，但我們現在就是要這麼做。
 
 我們也需要一個view來操作一個單獨的Snippet，以便能取回/更新/刪除該sinppet物件。
-
+```py
     @csrf_exempt
     def snippet_detail(request, pk):
         """
@@ -303,8 +303,9 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
         elif request.method == 'DELETE':
             snippet.delete()
             return HttpResponse(status=204)
-
-將views.py保存，在Snippets目錄下面創建urls.py,添加以下內容：
+```
+將`views.py`保存，在Snippets目錄下面創建`urls.py`,添加以下內容：
+```py
     from django.conf.urls import url
     from snippets import views
 
@@ -312,6 +313,7 @@ SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能�
         url(r'^snippets/$', views.snippet_list),
         url(r'^snippets/(?P<pk>[0-9]+)/$', views.snippet_detail),
     ]
+```
 We also need to wire up the root urlconf, in the `tutorial/urls.py` file, to include our snippet app's URLs.
 
     from django.conf.urls import url, include

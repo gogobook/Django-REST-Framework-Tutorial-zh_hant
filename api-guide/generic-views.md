@@ -11,7 +11,7 @@ REST framework提供的通用視圖允許您快速構建與您的數據庫模型
 
 例子
 通常，在使用通用視圖時，您將覆蓋視圖，並設置多個類屬性。
-
+```py
 from django.contrib.auth.models import User
 from myapp.serializers import UserSerializer
 from rest_framework import generics
@@ -21,8 +21,9 @@ class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser,)
+```
 對於更複雜的情況，您可能還希望覆蓋視圖類上的各種方法。例如。
-
+```py
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -33,6 +34,7 @@ class UserList(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
+```
 對於非常簡單的情況，您可能希望使用該.as_view()方法傳遞任何類屬性。例如，您的URLconf可能包含以下條目：
 
 url(r'^/users/', ListCreateAPIView.as_view(queryset=User.objects.all(), serializer_class=UserSerializer), name='user-list')
