@@ -37,14 +37,14 @@ class UserList(generics.ListCreateAPIView):
 ```
 對於非常簡單的情況，您可能希望使用該.as_view()方法傳遞任何類屬性。例如，您的URLconf可能包含以下條目：
 
-url(r'^/users/', ListCreateAPIView.as_view(queryset=User.objects.all(), serializer_class=UserSerializer), name='user-list')
-API參考
-GenericAPIView
+`url(r'^/users/', ListCreateAPIView.as_view(queryset=User.objects.all(), serializer_class=UserSerializer), name='user-list')`
+## API參考
+### GenericAPIView
 此類擴展了REST framework的APIView類，為標準列表和詳細信息視圖添加了常用的行為。
 
 提供的每個具體通用視圖是通過GenericAPIView與一個或多個mixin類組合而構建的。
 
-屬性
+#### 屬性
 基本設置：
 
 以下屬性控制基本視圖行為。
@@ -64,7 +64,7 @@ GenericAPIView
 方法
 基本方法：
 
-get_queryset(self)
+`get_queryset(self)`
 返回應該用於列表視圖的查詢集，該查詢集應該用作詳細視圖中查找的基礎。默認返回queryset屬性指定的查詢集。
 
 應始終使用此方法而不是self.queryset直接訪問，因為self.queryset只進行一次評估，並為所有後續請求緩存這些結果。
@@ -72,18 +72,19 @@ get_queryset(self)
 可以重寫以提供動態行為，例如返回查詢集，該查詢集特定於發出請求的用戶。
 
 例如：
-
+```py
 def get_queryset(self):
     user = self.request.user
     return user.accounts.all()
 
 get_object(self)
+```
 返回應該用於詳細視圖的對象實例。默認使用lookup_field參數來過濾基本查詢集。
 
 可以重寫以提供更複雜的行為，例如基於多個URL kwarg的對象查找。
 
 例如：
-
+```py
 def get_object(self):
     queryset = self.get_queryset()
     filter = {}
@@ -93,6 +94,7 @@ def get_object(self):
     obj = get_object_or_404(queryset, **filter)
     self.check_object_permissions(self.request, obj)
     return obj
+```
 請注意，如果您的API不包含任何對象級別權限，您可以選擇性地排除self.check_object_permissions，並簡單地從get_object_or_404查找中返回該對象。
 
 filter_queryset(self, queryset)

@@ -5,7 +5,7 @@
 
 - Jacob Kaplan-Moss
 
-REST framwork包含一些擴展自Django現有測試框架的助手類，並改進對API requests 的支持。
+REST framwork包含一些擴展自Django現有測試框架的助手類()，並改進對API requests 的支持。
 
 ## APIRequestFactory
 擴展了[Django的現有`RequestFactory`類](https://docs.djangoproject.com/en/2.0/topics/testing/advanced/#django.test.client.RequestFactory)。

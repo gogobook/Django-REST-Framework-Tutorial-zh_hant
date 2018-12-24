@@ -95,12 +95,12 @@
     class SnippetSerializer(serializers.Serializer):
         id = serializers.IntegerField(read_only=True)  
         title = serializers.CharField(required=False,
-                                    allow_blank=True,
-                                    max_length=100)
+                                      allow_blank=True,
+                                      max_length=100)
         code = serializers.CharField(style={'base_template': 'textarea.html'})                                    
         linenos = serializers.BooleanField(required=False)
         language = serializers.ChoiceField(choices=LANGUAGE_CHOICES,
-                                        default='python')
+                                           default='python')
         style = serializers.ChoiceField(choices=STYLE_CHOICES,
                                         default='friendly')
 
@@ -109,6 +109,7 @@
             Create or return a new 'Snippet' instance, given the validated data.
             """
             return Snippet.objects.create(**validated_data)
+
         def update(self, instance, validated_data):
             """
             update and return an existing `Snippet` instance, given the validated data.
@@ -126,9 +127,9 @@
 該序列化類的前面部分，定義了要序列化和反序列化的欄位(字段)(所以都是serializaers.什麼什麼)。
 當呼叫`serializer.save()`,`create()`和`update()` 方法定義了如何通過反序列化數據，生成或修改為正確的物件實例(所以都是validated_data.get(屬性)，然後instance.save()，最後返回instance)。
 
-一個序列化類與Django Form 類十分相似，且包含了相似的確效旗標在各個欄位上，比如`required`, `max_length`, `default`。
+一個序列化類與Django Form 類十分相似，且包含了相似的驗證標記在各個欄位上，比如`required`, `max_length`, `default`。
 
-在某些情況下，欄位旗標也可以用來控制serializer 如何被顯示。比如繪出為HTML時，上述的`{'base_template': 'textarea.html'}` 是等於Django Form class的 `widget=widgets.Textarea`。
+在某些情況下，欄位標記也可以用來控制serializer 如何被顯示。比如繪出為HTML時，上述的`{'base_template': 'textarea.html'}` 是等於Django Form class的 `widget=widgets.Textarea`。
 這對於控制`browsable API`如何被顯示十分有用，我們將在稍後的教學中看到。
 
 我們也可以使用ModelSerializer來快速生成，後面我們將看到如何使用它，但現在我們保持serializer定義明確。
@@ -179,7 +180,7 @@
 
 然後我們將該原生數據類型，轉換成物件實例
 
-    serializer = SnippetSerializer(data=data)#這裡不能跳過
+    serializer = SnippetSerializer(data=data) #這裡不能跳過
     serializer.is_valid()
     # True
     serializer.validated_data

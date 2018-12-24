@@ -108,7 +108,7 @@ class UserViewSet(viewsets.ViewSet):
 During dispatch, the following attributes are available on the ViewSet.
 當在分派時，下列屬性將可用於ViewSet
 
-- basename - the base to use for the URL names that are created.
+- base_name - the base to use for the URL names that are created.
 - action - the name of the current action (e.g., list, create).
 - detail - boolean indicating if the current action is configured for a list or detail view.
 - suffix - the display suffix for the viewset type - mirrors the detail attribute.
@@ -226,7 +226,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.request.user.accounts.all()
 ```
-注意，如果從您的`ViewSet`中刪除了`queryset`屬性，任何關聯的路由器將無法自動派生您的模型的`basename`，因此您將不得不指定`basename` kwarg作為路由器註冊的一部分。
+注意，如果從您的`ViewSet`中刪除了`queryset`屬性，任何關聯的路由器將無法自動派生您的模型的`base_name`，因此您將不得不指定`base_name` kwarg作為路由器註冊的一部分。
 
 還要注意,雖然這類提供了全套的create/list/retrieve/update/destroy actions 在預設情況下,您可以通過使用標準的限制可用操作許可類。
 

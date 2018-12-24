@@ -1,5 +1,5 @@
 
-> [官方原文链接](http://www.django-rest-framework.org/api-guide/relations/)  
+> [官方原文連結](http://www.django-rest-framework.org/api-guide/relations/)  
 
 # Serializer 關係
 
@@ -12,7 +12,7 @@
 在使用 `ModelSerializer` 類時，將自動為你生成序列化字段和關係字段。檢查這些自動生成的字段可以學習如何定製關係的格式。
 
 為此，使用 python manage.py shell 打開 Django shell，然後導入序列化類，實例化它並打印物件表示形式...
-``` python
+```python
 >>> from myapp.serializers import AccountSerializer
 >>> serializer = AccountSerializer()
 >>> print repr(serializer)  # Or `print(repr(serializer))` in Python 3.x.
@@ -23,8 +23,8 @@ AccountSerializer():
 ```
 ## API 參考
 
-為瞭解釋各種類型的關係字段，我們將為我們的示例使用幾個簡單的模型。我們的模型將使用音樂專輯，以及每張專輯中列出的曲目。
-``` python
+為瞭解釋各種類型的關係字段，我們將為我們的示例使用幾個簡單的模型。我們的模型將使用音樂專輯為例子，以及每張專輯中列出的曲目。
+```python
 class Album(models.Model):
     album_name = models.CharField(max_length=100)
     artist = models.CharField(max_length=100)
@@ -47,7 +47,7 @@ class Track(models.Model):
 `StringRelatedField` 用於使用 `__unicode__` 方法表示關係。
 
 例如，下面的序列化類。
-``` python
+```python
 class AlbumSerializer(serializers.ModelSerializer):
     tracks = serializers.StringRelatedField(many=True)
 
@@ -56,7 +56,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ('album_name', 'artist', 'tracks')
 ```
 將序列化為以下形式。
-``` python
+```python
 {
     'album_name': 'Things We Lost In The Fire',
     'artist': 'Low',
@@ -79,7 +79,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 `PrimaryKeyRelatedField` 用於使用其主鍵表示關係。
 
 例如，以下序列化類：
-``` python
+```python
 class AlbumSerializer(serializers.ModelSerializer):
     tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
@@ -88,7 +88,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ('album_name', 'artist', 'tracks')
 ```
 將序列化為這樣的表示：
-``` python
+```python
 {
     'album_name': 'Undun',
     'artist': 'The Roots',
@@ -114,7 +114,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 `HyperlinkedRelatedField` 用於使用超鏈接來表示關係。
 
 例如，以下序列化類：
-``` python
+```python
 class AlbumSerializer(serializers.ModelSerializer):
     tracks = serializers.HyperlinkedRelatedField(
         many=True,
@@ -127,7 +127,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ('album_name', 'artist', 'tracks')
 ```
 將序列化為這樣的表示：
-``` python
+```python
 {
     'album_name': 'Graceland',
     'artist': 'Paul Simon',
@@ -162,7 +162,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 `SlugRelatedField` 用於使用目標上的字段來表示關係。
 
 例如，以下序列化類：
-``` python
+```python
 class AlbumSerializer(serializers.ModelSerializer):
     tracks = serializers.SlugRelatedField(
         many=True,
@@ -175,7 +175,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ('album_name', 'artist', 'tracks')
 ```
 將序列化為這樣的表示：
-``` python
+```python
 {
     'album_name': 'Dear John',
     'artist': 'Loney Dear',
@@ -201,7 +201,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 ### HyperlinkedIdentityField
 
 此字段可以作為身份關係應用，例如 HyperlinkedModelSerializer 上的 'url' 字段。它也可以用於物件的屬性。例如，以下序列化類：
-``` python
+```python
 class AlbumSerializer(serializers.HyperlinkedModelSerializer):
     track_listing = serializers.HyperlinkedIdentityField(view_name='track-list')
 
@@ -210,7 +210,7 @@ class AlbumSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('album_name', 'artist', 'track_listing')
 ```
 將序列化為這樣的表示：
-``` python
+```python
 {
     'album_name': 'The Eraser',
     'artist': 'Thom Yorke',
@@ -234,7 +234,7 @@ class AlbumSerializer(serializers.HyperlinkedModelSerializer):
 舉個栗子
 
 例如，以下序列化類：
-``` python
+```python
 class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
@@ -248,7 +248,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ('album_name', 'artist', 'tracks')
 ```
 將序列化為這樣的嵌套表示：
-``` python
+```python
 >>> album = Album.objects.create(album_name="The Grey Album", artist='Danger Mouse')
 >>> Track.objects.create(album=album, order=1, title='Public Service Announcement', duration=245)
 <Track: Track object>
@@ -272,7 +272,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 ### 可寫嵌套序列化類
 
 默認情況下，嵌套序列化類是只讀的。如果要支持對嵌套序列化字段的寫操作，則需要創建 create() 和/或 update() 方法，以明確指定應如何保存子關係。
-``` python
+```python
 class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
@@ -319,7 +319,7 @@ True
 舉個栗子
 
 例如，我們可以定義一個關係字段，使用它的順序，標題和持續時間將音軌序列化為自定義字符串表示。
-``` python
+```python
 import time
 
 class TrackListingField(serializers.RelatedField):
@@ -335,7 +335,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         fields = ('album_name', 'artist', 'tracks')
 ```
 將序列化為這樣的表示：
-``` python
+```python
 {
     'album_name': 'Sometimes I Wish We Were an Eagle',
     'artist': 'Bill Callahan',
@@ -375,7 +375,7 @@ get_object(self, queryset, view_name, view_args, view_kwargs)
 這沒辦法用僅接受單個查找字段的默認實現來表示。
 
 在這種情況下，我們需要繼承 HyperlinkedRelatedField 並重寫其中的方法來獲得我們想要的行為：
-``` python
+```python
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -416,7 +416,7 @@ queryset 參數隻對可寫關係字段是必需的，在這種情況下，它�
 模型內置的 `__str__` 方法用來生成用於填充 choices 屬性的物件的字符串表示形式。這些 choices 用於在可瀏覽的 API 中填充選擇的 HTML input。
 
 要為這些 input 提供自定義表示，請重寫 RelatedField 子類的 display_value() 方法。這個方法將接收一個模型物件，並且應該返回一個適合表示它的字符串。例如：
-``` python
+```python
 class TrackPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     def display_value(self, instance):
         return 'Track: %s' % (instance.title)
@@ -435,7 +435,7 @@ class TrackPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 你還可以在 settings 中用 HTML_SELECT_CUTOFF 和 HTML_SELECT_CUTOFF_TEXT 來全局控制這些設置。
 
 在強制執行 cutoff 的情況下，您可能希望改為在 HTML 表單中使用簡單的 input 字段。你可以使用 style 關鍵字參數來做到這一點。例如：
-``` python
+```python
 assigned_to = serializers.SlugRelatedField(
    queryset=User.objects.all(),
    slug_field='username',
@@ -445,19 +445,19 @@ assigned_to = serializers.SlugRelatedField(
 ### 反向關係
 
 請注意，反向關係不會自動包含在 ModelSerializer 和 HyperlinkedModelSerializer 類中。要包含反向關係，您必須明確將其添加到字段列表中。例如：
-``` python
+```python
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('tracks', ...)
 ```
 通常需要確保已經在關係上設置了適當的 related_name 參數，可以將其用作字段名稱。例如：
-``` python
+```python
 class Track(models.Model):
     album = models.ForeignKey(Album, related_name='tracks', on_delete=models.CASCADE)
     ...
 ```
 如果你還沒有為反向關係設置相關名稱，則需要在 fields 參數中使用自動生成的相關名稱。例如：
-``` python
+```python
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('track_set', ...)
@@ -467,7 +467,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 如果要序列化通用外鍵，則需要自定義字段，以明確確定如何序列化關係。
 
 例如，給定一個以下模型的標籤，該標籤與其他任意模型具有通用關係：
-``` python
+```python
 class TaggedItem(models.Model):
     """
     Tags arbitrary model instances using a generic relation.
@@ -483,7 +483,7 @@ class TaggedItem(models.Model):
         return self.tag_name
 ```
 以下兩種模式可以用相關的標籤：
-``` python
+```python
 class Bookmark(models.Model):
     """
     A bookmark consists of a URL, and 0 or more descriptive tags.
@@ -493,7 +493,7 @@ class Bookmark(models.Model):
 
 ```
 
-``` python
+```python
 class Note(models.Model):
     """
     A note consists of some text, and 0 or more descriptive tags.
@@ -503,7 +503,7 @@ class Note(models.Model):
 ```
 我們可以定義一個可用於序列化標籤實例的自定義字段，並使用每個實例的類型來確定它應該如何序列化。
 
-``` python
+```python
 class TaggedObjectRelatedField(serializers.RelatedField):
     """
     A custom field to use for the `tagged_object` generic relationship.
@@ -520,7 +520,7 @@ class TaggedObjectRelatedField(serializers.RelatedField):
         raise Exception('Unexpected type of tagged object')
 ```
 如果你需要的關係具有嵌套表示，則可以在 .to_representation() 方法中使用所需的序列化類：
-``` python
+```python
     def to_representation(self, value):
         """
         Serialize bookmark instances using a bookmark serializer,
