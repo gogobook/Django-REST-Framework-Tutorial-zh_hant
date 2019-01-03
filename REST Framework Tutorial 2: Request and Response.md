@@ -33,7 +33,7 @@ rest framework引入了一個Response 物件，它是TemplateResponse的類型�
 
 包裝器也提供一些行為，例如在適當的時候返回`405 Methord Not Allowed`回應；在不正確輸入`request.data`時，處理任何的`ParseError`異常。
 
-## 5. 彙總
+## 5. 彙總(Pulling it all together)
 
 我們開始用這些新的組件來寫一些views。
 

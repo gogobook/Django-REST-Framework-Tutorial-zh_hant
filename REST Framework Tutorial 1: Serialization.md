@@ -1,10 +1,11 @@
 # Tutorial 1: 序列化 Serialization
 
-`新的教學好像改了很多東西，201606更新`
-`201701更新`
-`201801更新`
+`新的教學好像改了很多東西，201606更新` 
+`201701更新` 
+`201801更新` 
 ## 0. 介紹
 這個教學將包合建立一個簡單的pastebin 程式碼高亮 web api. 以此介紹REST framework所修飾的各種component, 並且讓你對所有的元件如何整合在一起有一個完整的了解。
+
 這個教學是非常深入的，所以你在開始前，可能要準備一些點心和一杯咖啡，假如你只是想要簡單看過，你應該去看quickstart
 <hr>
 **注意：**這個教學的程式碼可以在github 的tomchristie/rest-framework-tutorial 上找到，網路上也有完整的實作的砂盒版本。
@@ -73,8 +74,8 @@
                                     default='python',
                                     max_length=100)
         style = models.CharField(choices=STYLE_CHOICES,
-                                default='friendly',
-                                max_length=100)
+                                 default='friendly',
+                                 max_length=100)
 
         class Meta:
             ordering = ('created',)
@@ -197,11 +198,11 @@ We can also serialize querysets instead of model instances. To do so we simply a
     # [OrderedDict([('id', 1), ('title', u''), ('code', u'foo = "bar"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 2), ('title', u''), ('code', u'print "hello, world"\n'), ('linenos', False), ('language', 'python'), ('style', 'friendly')]), OrderedDict([('id', 3), ('title', u''), ('code', u'print "hello, world"'), ('linenos', False), ('language', 'python'), ('style', 'friendly')])]
 ```sh    
     ReturnDict([('pk', 3),
-            ('title', ''),
-            ('code', 'print("hello,world"\n'),
-            ('linenos', False),
-            ('language', 'python'),
-            ('style', 'friendly')])
+                ('title', ''),
+                ('code', 'print("hello,world"\n'),
+                ('linenos', False),
+                ('language', 'python'),
+                ('style', 'friendly')])
     #一些其他的例子
     
     
@@ -210,7 +211,7 @@ We can also serialize querysets instead of model instances. To do so we simply a
 
 SnippetSerializer使用了許多和Snippet中相同的代碼。如果我們能把這部分代碼去掉，看上去將更加簡潔。
 
-類似與django提供`Form`類和`ModelForm`類，Rest Framework也包含了`Serializer` 類和 `ModelSerializer`類。
+類似於django所提供的`Form`類和`ModelForm`類，Rest Framework也包含了`Serializer` 類和 `ModelSerializer`類。
 
 打開snippets/serializers.py ,修改SnippetSerializer類：
 

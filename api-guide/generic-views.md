@@ -1,4 +1,4 @@
-通用視圖
+#通用視圖 (即generic.GenericAPIView)
 > Django的通用視圖......被開發為常見用法模式的快捷方式......它們採用視圖開發中的某些常見習語和模式並對其進行抽象，以便您可以快速編寫數據的常用視圖，而無需重複自己。
 
 >- Django文檔
@@ -76,9 +76,9 @@ class UserList(generics.ListCreateAPIView):
 def get_queryset(self):
     user = self.request.user
     return user.accounts.all()
-
-get_object(self)
 ```
+`get_object(self)`
+
 返回應該用於詳細視圖的對象實例。默認使用lookup_field參數來過濾基本查詢集。
 
 可以重寫以提供更複雜的行為，例如基於多個URL kwarg的對象查找。

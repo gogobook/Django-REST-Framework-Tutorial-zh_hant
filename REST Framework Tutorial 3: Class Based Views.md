@@ -2,7 +2,7 @@
 
 [src](http://django-rest-framework.org/tutorial/3-class-based-views.html)
 
-在之前基於函數的View之外，我們還可以用基於類的view來實現我們的API view。正如我們即將看到的那樣，這樣的方式可以讓我們重用公用功能，並使我們保持代碼DRY。
+在之前基於函數的View之外，我們還可以用基於類的view來實現我們的API view。正如我們即將看到的那樣，這樣的方式可以讓我們重新使用公用功能，並使我們保持代碼DRY。
 
 ## 1.用基於類的view重寫我們的API 
 我們要用基於類的view來重寫剛才的`views.py`，如下重構所示：

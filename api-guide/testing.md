@@ -8,7 +8,7 @@
 REST framwork包含一些擴展自Django現有測試框架的助手類()，並改進對API requests 的支持。
 
 ## APIRequestFactory
-擴展了[Django的現有`RequestFactory`類](https://docs.djangoproject.com/en/2.0/topics/testing/advanced/#django.test.client.RequestFactory)。
+擴展了[Django的現有`RequestFactory`類](https://docs.djangoproject.com/en/2.1/topics/testing/advanced/#django.test.client.RequestFactory)。
 
 ### 創建測試請求
 本`APIRequestFactory`類支持幾乎相同的API來Django的標準RequestFactory類。這意味著，標準.get()，.post()，.put()，.patch()，.delete()，.head()和.options()方法都是可用的。

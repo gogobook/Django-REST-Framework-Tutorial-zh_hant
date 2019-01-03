@@ -2,7 +2,7 @@
 
 ## Serializers
 
-序列化器允許將諸如查詢集和模型例項之類的復雜資料轉換為原生 Python 資料型別，然後可以將它們輕鬆地呈現為 `JSON`，`XML` 或其他內容型別。序列化器還提供反序列化，在首次驗證傳入資料之後，可以將解析的資料轉換回復雜型別。
+序列化器允許將諸如查詢集和模型例項之類的複雜資料轉換為原生 Python 資料型別，然後可以將它們輕鬆地呈現為 `JSON`，`XML` 或其他內容型別。序列化器還提供反序列化，在首次驗證傳入資料之後，可以將解析的資料轉換回複雜型別。
 
 REST framework 中的序列化類與 Django 的 `Form` 和 `ModelForm` 類非常相似。我們提供了一個 `Serializer` 類，它提供了一種強大的通用方法來控制響應的輸出，以及一個 `ModelSerializer` 類，它為建立處理模型例項和查詢集的序列化提供了有效的快捷方式。
 
@@ -294,7 +294,7 @@ serializer = CommentSerializer(comment, data={'content': u'foo bar'}, partial=Tr
 
 ### 8. 處理巢狀物件
 
-前面的例子適用於處理只具有簡單資料型別的物件，但有時還需要能夠表示更復雜的物件，其中物件的某些屬性可能不是簡單的資料型別，如字串，日期或整數。
+前面的例子適用於處理只具有簡單資料型別的物件，但有時還需要能夠表示更複雜的物件，其中物件的某些屬性可能不是簡單的資料型別，如字串，日期或整數。
 
 `Serializer` 類本身就是一種 `Field`，可以用來表示一個物件型別巢狀在另一個物件型別中的關係。
 
@@ -401,7 +401,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 ```
 
-因為巢狀建立和更新的行為可能不明確，並且可能需要相關模型之間的復雜依賴關係，所以 REST framework 3 要求你始終明確寫入這些方法。預設的 `ModelSerializer` 的 `.create()`和 `.update()` 方法不包括對可寫巢狀表示的支援。
+因為巢狀建立和更新的行為可能不明確，並且可能需要相關模型之間的複雜依賴關係，所以 REST framework 3 要求你始終明確寫入這些方法。預設的 `ModelSerializer` 的 `.create()`和 `.update()` 方法不包括對可寫巢狀表示的支援。
 
 不過，有第三方軟體包可用，如支援自動可寫巢狀表示的 [DRF Writable Nested](http://www.django-rest-framework.org/api-guide/serializers/#drf-writable-nested)。
 
