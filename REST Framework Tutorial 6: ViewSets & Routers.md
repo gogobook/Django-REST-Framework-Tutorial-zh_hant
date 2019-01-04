@@ -52,7 +52,7 @@ class SnippetViewSet(viewsets.ModelViewSet):
 
 注意我們還使用`@action`修飾符來創建一個自定義動作名為`highlight`。這個修飾符可以用來添加任何自定義endpoints，不用符合標準的`create`/`update`/`delete`樣式。
 
-用`@action`修飾符創建的自定義動作將會對`GET`做出響應。我們也可以使用`method`參數代替如果我們想要一個對`POST`請求做出響應的動作。
+用`@action`修飾符創建的自定義動作將會對`GET`做出response 。我們也可以使用`method`參數代替如果我們想要一個對`POST`請求做出response 的動作。
 
 The URLs for custom actions by default depend on the method name itself. If you want to change the way url should be constructed, you can include `url_path` as a decorator keyword argument.
 

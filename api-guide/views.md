@@ -1,9 +1,8 @@
 source:decorators.py views.py
 
 # 基於類的視圖
-Django的基於階級的觀點是對舊式觀點的歡迎。
+Django的基於類的視圖是對舊式視圖的脫離。
 Django's class-based views are a welcome departure from the old-style views.
-
 
 - Reinout van Rees
 
@@ -12,9 +11,10 @@ REST框架提供了一個`APIView`類，它是Django View類的子類。
 `APIView`類View通過以下方式與常規類不同:
 
 - 傳遞給處理程序方法的請求將是REST框架的`Request`實例，而不是Django的HttpRequest實例。
-- 處理程序方法可能會返回REST框架`Response`，而不是Django HttpResponse。該視圖將管理內容協商並在響應上設置正確的渲染器。
-- 任何`APIException`例外都將被捕獲並調解為適當的響應。
+- 處理程序方法可能會返回REST框架`Response`，而不是Django HttpResponse。該視圖將管理內容協商並在response 上設置正確的渲染器。
+- 任何`APIException`例外都將被捕獲並調解為適當的response 。
 - 將傳入的請求進行身份驗證，並在將請求分派給處理程序方法之前運行適當的權限和/或限制檢查。
+
 使用`APIView`該類與使用常規`View`類幾乎相同，像往常一樣，傳入的請求被分派到適當的處理程序方法，如.get()或.post()。另外，可以在控制API策略的各個方面的類上設置許多屬性。
 
 例如:
@@ -41,7 +41,7 @@ class ListUsers(APIView):
         usernames = [user.username for user in User.objects.all()]
         return Response(usernames)
 ```
-注:完整的方法，屬性，並與Django的REST框架的關係`APIView`，Generic`APIView`各種Mixins，並且Viewsets可以初步複雜。除了此處的文檔之外，Classy Django REST Framework資源還為Django REST Framework的每個基於類的視圖提供了可瀏覽的引用，包括完整的方法和屬性。
+注: 完整的方法，屬性，並與Django的REST框架的關係`APIView`，Generic`APIView`各種Mixins，並且Viewsets可以初步複雜。除了此處的文檔之外，Classy Django REST Framework資源還為Django REST Framework的每個基於類的視圖提供了可瀏覽的引用，包括完整的方法和屬性。
 
 ## API策略屬性
 以下屬性控制API視圖的可插入方面。
@@ -82,9 +82,9 @@ REST框架使用以下方法來實例化各種可插入API策略。您通常不�
 .handle_exception(self，exc)
 處理程序方法拋出的任何異常都將傳遞給此方法，該方法返回Response實例或重新引發異常。
 
-默認實現處理任何子類rest_framework.exceptions.APIException，以及Django Http404和PermissionDenied異常，並返回適當的錯誤響應。
+默認實現處理任何子類rest_framework.exceptions.APIException，以及Django Http404和PermissionDenied異常，並返回適當的錯誤response 。
 
-如果您需要自定義API返回的錯誤響應，則應該對此方法進行子類化。
+如果您需要自定義API返回的錯誤response ，則應該對此方法進行子類化。
 
 .initialize_request(self，request，* args，** kwargs)
 確保傳遞給handler方法的請求對像是一個實例Request，而不是通常的Django HttpRequest。
@@ -106,7 +106,7 @@ REST框架還允許您使用基於常規功能的視圖。它提供了一組簡�
 ## @api_view()
 簽名: `@api_view(http_method_names=['GET'])`
 
-此功能的核心是api_view裝飾器，它接收視圖應響應的HTTP方法列表。例如，這就是你如何編寫一個非常簡單的視圖，只需手動返回一些數據:
+此函數的核心是api_view裝飾器，它接收視圖應response 的HTTP方法列表。例如，這就是你如何編寫一個非常簡單的視圖，只需手動返回一些數據:
 ```py
 from rest_framework.decorators import api_view
 
@@ -116,7 +116,7 @@ def hello_world(request):
 ```
 此視圖將使用設置中指定的默認渲染器，解析器，身份驗證類等。
 
-默認情況下，只GET接受方法。其他方法將響應“405 Method Not Allowed”。要更改此行為，請指定視圖允許的方法，如下所示:
+默認情況下，只GET接受方法。其他方法將response “405 Method Not Allowed”。要更改此行為，請指定視圖允許的方法，如下所示:
 ```py
 @api_view(['GET', 'POST'])
 def hello_world(request):

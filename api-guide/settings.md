@@ -75,7 +75,7 @@ print api_settings.DEFAULT_AUTHENTICATION_CLASSES
 默認： ()
 
 #### DEFAULT_CONTENT_NEGOTIATION_CLASS
-內容協商類，用於確定如何為響應選擇渲染器，並給定傳入請求。
+內容協商類，用於確定如何為response 選擇渲染器，並給定傳入請求。
 
 默認： `'rest_framework.negotiation.DefaultContentNegotiation'`
 
@@ -251,24 +251,24 @@ URL conf中可用於提供格式後綴的參數名稱。此設置適用於使用
 
 ## 編碼
 #### UNICODE_JSON
-設置True為時，JSON響應將允許在響應中使用unicode字符。例如：
+設置True為時，JSONresponse 將允許在response 中使用unicode字符。例如：
 
 {"unicode black star":"★"}
-設置False為時，JSON響應將轉義非ascii字符，如下所示：
+設置False為時，JSONresponse 將轉義非ascii字符，如下所示：
 
 {"unicode black star":"\u2605"}
-兩種樣式都符合RFC 4627，並且在語法上有效JSON。在檢查API響應時，unicode樣式更受用戶歡迎。
+兩種樣式都符合RFC 4627，並且在語法上有效JSON。在檢查APIresponse 時，unicode樣式更受用戶歡迎。
 
 默認： True
 
 #### COMPACT_JSON
-當設置為True，JSON響應將返回簡潔表示，用後無間距':'和','字符。例如：
+當設置為True，JSONresponse 將返回簡潔表示，用後無間距':'和','字符。例如：
 
 `{"is_admin":false,"email":"jane@example"}`
-設置False為時，JSON響應將返回稍微更詳細的表示，如下所示：
+設置False為時，JSONresponse 將返回稍微更詳細的表示，如下所示：
 
 `{"is_admin": false, "email": "jane@example"}`
-默認樣式是返回縮小的響應，符合Heroku的API設計準則。
+默認樣式是返回縮小的response ，符合Heroku的API設計準則。
 
 默認： True
 
@@ -287,7 +287,7 @@ URL conf中可用於提供格式後綴的參數名稱。此設置適用於使用
 默認： True
 
 ### 查看名稱和說明
-以下設置用於生成視圖名稱和描述，如對OPTIONS請求的響應中所使用的，以及在可瀏覽的API中使用的。
+以下設置用於生成視圖名稱和描述，如對OPTIONS請求的response 中所使用的，以及在可瀏覽的API中使用的。
 
 #### VIEW_NAME_FUNCTION
 表示生成視圖名稱時應使用的函數的字符串。
@@ -308,7 +308,7 @@ URL conf中可用於提供格式後綴的參數名稱。此設置適用於使用
 
 `view_description(cls, html=False)`
 - cls：視圖類。通常，描述函數會在生成描述時通過訪問來檢查類的文檔字符串cls.__doc__
-- html：一個布爾值，指示是否需要HTML輸出。 True當在可瀏覽的API中False使用時，以及用於生成OPTIONS響應時。
+- html：一個布爾值，指示是否需要HTML輸出。 True當在可瀏覽的API中False使用時，以及用於生成OPTIONSresponse 時。
 默認： 'rest_framework.views.get_view_description'
 
 ### HTML選擇字段截止
@@ -326,9 +326,9 @@ html_cutoff價值的全局設置。必須是整數。
 
 ## 雜項設置
 #### EXCEPTION_HANDLER
-一個字符串，表示在返回任何給定異常的響應時應使用的函數。如果函數返回None，將會引發500錯誤。
+一個字符串，表示在返回任何給定異常的response 時應使用的函數。如果函數返回None，將會引發500錯誤。
 
-此設置可以更改為支持默認{"detail": "Failure..."}響應以外的錯誤響應。例如，您可以使用它來提供API響應`{"errors": [{"message": "Failure...", "code": ""} ...]}`。
+此設置可以更改為支持默認{"detail": "Failure..."}response 以外的錯誤response 。例如，您可以使用它來提供APIresponse `{"errors": [{"message": "Failure...", "code": ""} ...]}`。
 
 這應該是一個具有以下簽名的函數：
 

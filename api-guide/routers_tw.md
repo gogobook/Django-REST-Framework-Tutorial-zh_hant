@@ -150,7 +150,7 @@ REST framework增加了對Django的自動URL路由的支持，並為您提供了
         lookup_value_regex = '[0-9a-f]{32}'
 
 ## DefaultRouter
-此路由器與`SimpleRouter`上述類似，但另外包括一個默認的API根視圖，它返回一個包含所有列表視圖的超鏈接的響應。它還為可選的.json樣式格式後綴生成路由。
+此路由器與`SimpleRouter`上述類似，但另外包括一個默認的API根視圖，它返回一個包含所有列表視圖的超鏈接的response 。它還為可選的.json樣式格式後綴生成路由。
 
 上述
 <table border=1>

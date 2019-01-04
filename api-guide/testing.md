@@ -285,9 +285,9 @@ class AccountTests(APITestCase, URLPatternsTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 ```
-## 測試響應
-### 檢查響應數據
-在檢查測試響應的有效性時，檢查響應的創建數據通常比較方便，而不是檢查完全響應。
+## 測試response 
+### 檢查response 數據
+在檢查測試response 的有效性時，檢查response 的創建數據通常比較方便，而不是檢查完全response 。
 
 例如，檢查`response.data`更容易：
 ```py
@@ -299,8 +299,8 @@ self.assertEqual(response.data, {'id': 4, 'username': 'lauren'})
 response = self.client.get('/users/4/')
 self.assertEqual(json.loads(response.content), {'id': 4, 'username': 'lauren'})
 ```
-### 呈現響應
-如果您直接使用`APIRequestFactory`測試視圖，則返回的響應將不會呈現，因為模板響應的呈現由Django的內部請求 - 響應循環執行。為了訪問`response.content`，您首先需要呈現響應。
+### 呈現response 
+如果您直接使用`APIRequestFactory`測試視圖，則返回的response 將不會呈現，因為模板response 的呈現由Django的內部請求 - response 循環執行。為了訪問`response.content`，您首先需要呈現response 。
 ```py
 view = UserDetail.as_view()
 request = factory.get('/users/4')

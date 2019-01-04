@@ -43,9 +43,9 @@ When the permissions checks fail either a "403 Forbidden" or a "401 Unauthorized
 * The request was not successfully authenticated, and the highest priority authentication class *does not* use `WWW-Authenticate` headers. *&mdash; An HTTP 403 Forbidden response will be returned.*
 * The request was not successfully authenticated, and the highest priority authentication class *does* use `WWW-Authenticate` headers. *&mdash; An HTTP 401 Unauthorized response, with an appropriate `WWW-Authenticate` header will be returned.*
 
-* 請求已成功通過身份驗證，但權限已被拒絕。 - 將返回HTTP 403 Forbidden響應。
-* 請求未成功通過身份驗證，並且優先級最高的身份驗證類不使用WWW-Authenticate標頭。 - 將返回HTTP 403 Forbidden響應。
-* 請求未成功通過身份驗證，並且優先級最高的身份驗證類確實使用WWW-Authenticate標頭。- WWW-Authenticate將返回帶有適當標頭的HTTP 401 Unauthorized響應。
+* 請求已成功通過身份驗證，但權限已被拒絕。 - 將返回HTTP 403 Forbiddenresponse 。
+* 請求未成功通過身份驗證，並且優先級最高的身份驗證類不使用WWW-Authenticate標頭。 - 將返回HTTP 403 Forbiddenresponse 。
+* 請求未成功通過身份驗證，並且優先級最高的身份驗證類確實使用WWW-Authenticate標頭。- WWW-Authenticate將返回帶有適當標頭的HTTP 401 Unauthorizedresponse 。
 
 ## Object level permissions
 ## 物件級權限

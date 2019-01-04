@@ -168,33 +168,33 @@ mixin類可以從中導入rest_framework.mixins。
 ListModelMixin
 提供一種.list(request, *args, **kwargs)實現列出查詢集的方法。
 
-如果填充了查詢集，則返迴200 OK響應，並將查詢集的序列化表示形式作為響應的主體。可選地，可以對響應數據進行分頁。
+如果填充了查詢集，則返迴200 OKresponse ，並將查詢集的序列化表示形式作為response 的主體。可選地，可以對response 數據進行分頁。
 
 CreateModelMixin
 提供.create(request, *args, **kwargs)實現創建和保存新模型實例的方法。
 
-如果創建了一個對象，則返回一個201 Created響應，該對象的序列化表示形式作為響應的主體。如果表示包含名為的鍵url，則Location響應的標題將填充該值。
+如果創建了一個對象，則返回一個201 Createdresponse ，該對象的序列化表示形式作為response 的主體。如果表示包含名為的鍵url，則Locationresponse 的標題將填充該值。
 
-如果為創建對象而提供的請求數據無效，400 Bad Request則將返迴響應，並將錯誤詳細信息作為響應的主體。
+如果為創建對象而提供的請求數據無效，400 Bad Request則將返迴response ，並將錯誤詳細信息作為response 的主體。
 
 RetrieveModelMixin
-提供一種.retrieve(request, *args, **kwargs)方法，該方法實現在響應中返回現有模型實例。
+提供一種.retrieve(request, *args, **kwargs)方法，該方法實現在response 中返回現有模型實例。
 
-如果可以檢索對象，則返迴200 OK響應，並將對象的序列化表示作為響應的主體。否則它會返回一個404 Not Found。
+如果可以檢索對象，則返迴200 OKresponse ，並將對象的序列化表示作為response 的主體。否則它會返回一個404 Not Found。
 
 UpdateModelMixin
 提供.update(request, *args, **kwargs)實現更新和保存現有模型實例的方法。
 
 還提供了.partial_update(request, *args, **kwargs)一種類似於該update方法的方法，除了更新的所有字段都是可選的。這允許支持HTTP PATCH請求。
 
-如果更新了對象，則返迴200 OK響應，並將對象的序列化表示作為響應的主體。
+如果更新了對象，則返迴200 OKresponse ，並將對象的序列化表示作為response 的主體。
 
-如果為更新對象而提供的請求數據無效，400 Bad Request則將返迴響應，並將錯誤詳細信息作為響應的主體。
+如果為更新對象而提供的請求數據無效，400 Bad Request則將返迴response ，並將錯誤詳細信息作為response 的主體。
 
 DestroyModelMixin
 提供一種.destroy(request, *args, **kwargs)實現刪除現有模型實例的方法。
 
-如果刪除了一個對象，則返回一個204 No Content響應，否則返回一個404 Not Found。
+如果刪除了一個對象，則返回一個204 No Contentresponse ，否則返回一個404 Not Found。
 
 具體視圖類
 以下類是具體的通用視圖。如果您使用的是通用視圖，這通常是您將要工作的級別，除非您需要大量自定義的行為。
@@ -308,7 +308,7 @@ class BaseRetrieveUpdateDestroyView(MultipleFieldLookupMixin,
 PUT為創造
 在3.0版之前，REST frameworkmixin被PUT視為更新或創建操作，具體取決於對像是否已存在。
 
-允許PUT作為創建操作是有問題的，因為它必然暴露有關對象的存在或不存在的信息。透明地允許重新創建先前刪除的實例並不一定是比簡單地返迴404響應更好的默認行為。
+允許PUT作為創建操作是有問題的，因為它必然暴露有關對象的存在或不存在的信息。透明地允許重新創建先前刪除的實例並不一定是比簡單地返迴404response 更好的默認行為。
 
 兩種樣式“ PUTas 404”和“ PUTas create”在不同情況下都可以有效，但從版本3.0開始，我們現在使用404行為作為默認值，因為它更簡單，更明顯。
 

@@ -1,12 +1,12 @@
 > [官方原文連結](http://www.django-rest-framework.org/api-guide/serializers/)
 
-## Serializers
+# Serializers
 
-序列化器允許將諸如查詢集和模型例項之類的複雜資料轉換為原生 Python 資料型別，然後可以將它們輕鬆地呈現為 `JSON`，`XML` 或其他內容型別。序列化器還提供反序列化，在首次驗證傳入資料之後，可以將解析的資料轉換回複雜型別。
+序列化器允許將諸如查詢集和模型實例之類的複雜資料轉換為原生 Python 資料型別，然後可以將它們輕鬆地呈現為 `JSON`，`XML` 或其他內容型別。序列化器還提供反序列化，在首次驗證傳入資料之後，可以將解析的資料轉換回複雜型別。
 
-REST framework 中的序列化類與 Django 的 `Form` 和 `ModelForm` 類非常相似。我們提供了一個 `Serializer` 類，它提供了一種強大的通用方法來控制響應的輸出，以及一個 `ModelSerializer` 類，它為建立處理模型例項和查詢集的序列化提供了有效的快捷方式。
+REST framework 中的序列化類與 Django 的 `Form` 和 `ModelForm` 類非常相似。我們提供了一個 `Serializer` 類，提供了一種強大的通用方法來控制response 的輸出，以及一個 `ModelSerializer` 類，它為建立處理模型實例和查詢集的序列化提供了有效的快捷方式。
 
-### 1. 宣告序列化類
+## 1. 宣告序列化類
 
 首先建立一個簡單的物件用於示例：
 
@@ -35,9 +35,9 @@ class CommentSerializer(serializers.Serializer):
     created = serializers.DateTimeField()
 ```
 
-### 2. 序列化物件
+## 2. 序列化物件
 
-現在可以使用 `CommentSerializer` 來序列化評論或評論列表。同樣，使用 `Serializer` 類看起來很像使用 `Form` 類。
+現在可以使用 `CommentSerializer` 來序列化`Comment`或`Comment`列表。同樣，使用 `Serializer` 類看起來很像使用 `Form` 類。
 
 ``` python
 serializer = CommentSerializer(comment)
@@ -45,7 +45,7 @@ serializer.data
 # {'email': 'leila@example.com', 'content': 'foo bar', 'created': '2016-01-27T15:17:10.375877'}
 ```
 
-此時已經將模型例項轉換為 Python 原生資料型別。為了完成序列化過程，將資料渲染為 `json`。
+此時已經將模型實例轉換為 Python 原生資料型別。為了完成序列化過程，將資料渲染為 `json`。
 
 ``` python
 from rest_framework.renderers import JSONRenderer
@@ -56,7 +56,7 @@ json
 ```
 
 
-### 3. 資料反序列化為物件
+## 3. 資料反序列化為物件
 
 反序列化是相似的。首先我們將一個流解析為 Python 原生資料型別...
 
@@ -81,9 +81,9 @@ serializer.validated_data
 
 
 
-### 4. 儲存例項
+## 4. 儲存實例
 
-如果希望能夠基於驗證的資料返回完整的物件例項，則需要實現 `.create()` 和 `.update()` 方法中的一個或兩個。例如：
+如果希望能夠基於驗證的資料返回完整的物件實例，則需要實現 `.create()` 和 `.update()` 方法中的一個或兩個。例如：
 
 ``` python
 class CommentSerializer(serializers.Serializer):
@@ -101,7 +101,7 @@ class CommentSerializer(serializers.Serializer):
         return instance
 ```
 
-如果物件例項與 Django 模型相對應，還需要確保這些方法將物件儲存到資料庫。如果 `Comment` 是一個 Django 模型，這些方法可能如下所示：
+如果物件實例與 Django 模型相對應，還需要確保這些方法將物件儲存到資料庫。如果 `Comment` 是一個 Django 模型，這些方法可能如下所示：
 
 ``` python
     def create(self, validated_data):
@@ -115,13 +115,13 @@ class CommentSerializer(serializers.Serializer):
         return instance
 ```
 
-現在，當反序列化資料時，我們可以呼叫 `.save()` 根據驗證的資料返回一個物件例項。
+現在，當反序列化資料時，我們可以呼叫 `.save()` 根據驗證的資料返回一個物件實例。
 
 ``` python
 comment = serializer.save()
 ```
 
-呼叫 `.save()` 將建立一個新例項或更新現有例項，具體取決於在例項化序列化類時是否傳遞了現有例項：
+呼叫 `.save()` 將建立一個新實例或更新現有實例，具體取決於在實例化序列化類時是否傳遞了現有實例：
 
 ``` python
 # .save() will create a new instance.
@@ -135,7 +135,7 @@ serializer = CommentSerializer(comment, data=data)
 
 #### 將附加屬性傳遞給 `.save()`
 
-有時你會希望你的檢視程式碼能夠在儲存例項的時候注入額外的資料。這些附加資料可能包含當前使用者，當前時間或其他任何不屬於請求資料的資訊。
+有時你會希望你的檢視程式碼能夠在儲存實例的時候注入額外的資料。這些附加資料可能包含當前使用者，當前時間或其他任何不屬於請求資料的資訊。
 
 ``` python
 serializer.save(owner=request.user)
@@ -145,7 +145,7 @@ serializer.save(owner=request.user)
 
 #### 直接覆蓋 `.save()`。
 
-在某些情況下，`.create()` 和 `.update()` 方法名稱可能沒有意義。例如，在 “聯絡人表單” 中，我們可能不會建立新例項，而是傳送電子郵件或其他訊息。
+在某些情況下，`.create()` 和 `.update()` 方法名稱可能沒有意義。例如，在 “聯絡人表單” 中，我們可能不會建立新實例，而是傳送電子郵件或其他訊息。
 
 在這些情況下，可以選擇直接覆蓋 `.save()`，因為它更具可讀性和有意義性。
 
@@ -164,9 +164,9 @@ class ContactForm(serializers.Serializer):
 
 請注意，在上面的情況下，必須直接訪問 `serializer .validated_data` 屬性。
 
-### 5. 驗證
+## 5. 驗證
 
-在資料反序列化時，你總是需要在嘗試訪問驗證資料之前呼叫 `is_valid()`，或者儲存物件例項。如果發生任何驗證錯誤，那麼 `.errors` 屬性將包含一個代表錯誤訊息的字典。例如：
+在資料反序列化時，你總是需要在嘗試訪問驗證資料之前呼叫 `is_valid()`，或者儲存物件實例。如果發生任何驗證錯誤，那麼 `.errors` 屬性將包含一個代表錯誤訊息的字典。例如：
 
 ``` python
 serializer = CommentSerializer(data={'email': 'foobar', 'content': 'baz'})
@@ -244,7 +244,7 @@ class EventSerializer(serializers.Serializer):
 
 #### 驗證器
 
-序列化器上的各個欄位可以包含驗證器，方法是在欄位例項上宣告它們，例如：
+序列化器上的各個欄位可以包含驗證器，方法是在欄位實例上宣告它們，例如：
 
 ``` python
 def multiple_of_ten(value):
@@ -272,14 +272,14 @@ class EventSerializer(serializers.Serializer):
         )
 ```
 
-> 看不懂没關係哦，更多关於驗證的内容，以后還会说到。
+> 看不懂没關係哦，更多關於驗證的内容，以后還會说到。
 
 
-### 6. 訪問例項和初始資料
+### 6. 訪問實例和初始資料
 
-將初始物件或查詢集傳遞給序列化類例項時，該物件將作為 `.instance` 提供。如果沒有傳遞初始物件，則 `.instance` 屬性將為 `None`。
+將初始物件或查詢集傳遞給序列化類實例時，該物件將作為 `.instance` 提供。如果沒有傳遞初始物件，則 `.instance` 屬性將為 `None`。
 
-將資料傳遞給序列化類例項時，未修改的資料將作為 `.initial_data` 提供。如果 data 關鍵字引數未被傳遞，那麼 `.initial_data` 屬性將不存在。
+將資料傳遞給序列化類實例時，未修改的資料將作為 `.initial_data` 提供。如果 data 關鍵字引數未被傳遞，那麼 `.initial_data` 屬性將不存在。
 
 
 ### 7. 部分更新
@@ -318,7 +318,7 @@ class CommentSerializer(serializers.Serializer):
     created = serializers.DateTimeField()
 ```
 
-同樣，如果巢狀物件是一個列表，則應將 `many = True` 標誌傳遞給巢狀的序列化類。
+同樣，如果巢狀物件是一個列表，則應將 `many=True` 標誌傳遞給巢狀的序列化類。
 
 ``` python
 class CommentSerializer(serializers.Serializer):
@@ -369,7 +369,7 @@ class UserSerializer(serializers.ModelSerializer):
 對於更新，您需要仔細考慮如何處理關係更新。例如，如果關係的資料是 `None` 或沒有提供，則應發生以下哪種情況？
 
 * 在資料庫中將關係設定為 `NULL`。
-* 刪除關聯的例項。
+* 刪除關聯的實例。
 * 忽略資料並保持原樣。
 * 引發驗證錯誤。
 
@@ -406,11 +406,11 @@ class UserSerializer(serializers.ModelSerializer):
 不過，有第三方軟體包可用，如支援自動可寫巢狀表示的 [DRF Writable Nested](http://www.django-rest-framework.org/api-guide/serializers/#drf-writable-nested)。
 
 
-#### 在模型管理器類中儲存相關的例項
+#### 在模型管理器類中儲存相關的實例
 
-在序列化類中儲存多個相關例項的另一種方法是編寫自定義模型管理器類。
+在序列化類中儲存多個相關實例的另一種方法是編寫自定義模型管理器類。
 
-例如，假設我們希望確保 `User` 例項和 `Profile` 例項始終作為一對建立。我們可能會編寫一個類似下面的自定義管理器類：
+例如，假設我們希望確保 `User` 實例和 `Profile` 實例始終作為一對建立。我們可能會編寫一個類似下面的自定義管理器類：
 
 ``` python
 class UserManager(models.Manager):
@@ -428,7 +428,7 @@ class UserManager(models.Manager):
         return user
 ```
 
-此管理器類現在更好地封裝了使用者例項和配置檔案例項始終在同一時間建立。現在可以重新編寫序列化類上的 `.create()`方法，以使用新的管理類方法。
+此管理器類現在更好地封裝了使用者實例和配置檔案實例始終在同一時間建立。現在可以重新編寫序列化類上的 `.create()`方法，以使用新的管理類方法。
 
 ``` python
 def create(self, validated_data):
@@ -447,7 +447,7 @@ def create(self, validated_data):
 
 #### 序列化多個物件
 
-要序列化查詢集或物件列表而不是單個物件例項，在例項化序列化類時，應該傳遞 `many=True` 標誌。然後，您可以傳遞要序列化的查詢集或物件列表。
+要序列化查詢集或物件列表而不是單個物件實例，在實例化序列化類時，應該傳遞 `many=True` 標誌。然後，您可以傳遞要序列化的查詢集或物件列表。
 
 ``` python
 queryset = Book.objects.all()
@@ -470,7 +470,7 @@ serializer.data
 
 除了被序列化的物件外，還有一些情況需要為序列化類提供額外的上下文。一種常見的情況是，如果你使用的是包含超連結關係的序列化類，則需要序列化類訪問當前請求，以便它可以正確生成完全限定的URL。
 
-在例項化序列化物件時，你可以通過傳遞上下文引數來提供任意附加上下文。例如：
+在實例化序列化物件時，你可以通過傳遞上下文引數來提供任意附加上下文。例如：
 
 ``` python
 serializer = AccountSerializer(account, context={'request': request})
@@ -511,7 +511,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
 序列化類能夠生成一個表示字串，可以讓你充分檢查其欄位的狀態。在使用 `ModelSerializer` 進行工作時，這是特別有用的，你需要確定它為你自動建立了哪些欄位和驗證器。
 
-為此，使用 `python manage.py shell` 進入 Django shell，然後匯入序列化類，例項化它並列印物件表示形式...
+為此，使用 `python manage.py shell` 進入 Django shell，然後匯入序列化類，實例化它並列印物件表示形式...
 
 ``` python
 >>> from myapp.serializers import AccountSerializer
@@ -655,14 +655,14 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 ### 關係欄位
 
-序列化模型例項時，可以選擇多種不同的方式來表示關係。`ModelSerializer` 的預設表示是使用相關例項的主鍵。
+序列化模型實例時，可以選擇多種不同的方式來表示關係。`ModelSerializer` 的預設表示是使用相關實例的主鍵。
 
 其他表示形式包括使用超連結序列化，序列化完整巢狀表示形式或使用自定義表示形式序列化。
 
 
 ### 自定義欄位對映
 
-ModelSerializer 類還公開了一個可以覆蓋的 API，以便在例項化序列化物件時更改序列化物件的欄位。
+ModelSerializer 類還公開了一個可以覆蓋的 API，以便在實例化序列化物件時更改序列化物件的欄位。
 
 
 通常，如果 `ModelSerializer` 沒辦法生成預設需要的欄位，那麼你應該將它們明確地新增到類中，或者直接使用常規的`Serializer` 類。但是，在某些情況下，你可能需要建立一個新的基類，以定義如何為給定模型建立序列化物件的欄位。
@@ -766,7 +766,7 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
 
 ### 絕對和相對 URL
 
-在例項化 `HyperlinkedModelSerializer` 時，必須在序列化上下文中包含當前請求，例如：
+在實例化 `HyperlinkedModelSerializer` 時，必須在序列化上下文中包含當前請求，例如：
 
 ``` python
 serializer = AccountSerializer(queryset, context={'request': request})
@@ -789,9 +789,9 @@ http://api.example.com/accounts/1/
 
 ### 如何確定超連結檢視
 
-需要確定哪些檢視應該用於超連結到模型例項。
+需要確定哪些檢視應該用於超連結到模型實例。
 
-預設情況下，超連結預期對應於與樣式 `'{model_name}-detail'` 匹配的檢視名稱，並通過 `pk` 關鍵字引數查詢例項。
+預設情況下，超連結預期對應於與樣式 `'{model_name}-detail'` 匹配的檢視名稱，並通過 `pk` 關鍵字引數查詢實例。
 
 您可以使用 `extra_kwargs` 設定中的 `view_name` 和 `lookup_field` 選項覆蓋 URL 欄位檢視名稱和查詢欄位，如下所示：
 
@@ -827,7 +827,7 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'account_name', 'users', 'created')
 ```
 
-> 提示：正確地匹配超連結和 URL conf 有時可能有點困難。列印 `HyperlinkedModelSerializer` 例項的 `repr` 是一種特別有用的方法，可以準確檢查這些關係預期對映的 view name 和 lookup field。
+> 提示：正確地匹配超連結和 URL conf 有時可能有點困難。列印 `HyperlinkedModelSerializer` 實例的 `repr` 是一種特別有用的方法，可以準確檢查這些關係預期對映的 view name 和 lookup field。
 
 
 ### 更改 URL 欄位名稱
@@ -836,11 +836,11 @@ URL 欄位的名稱預設為 'url'。可以使用 `URL_FIELD_NAME`  （在 setti
 
 ## ListSerializer
 
-`ListSerializer` 類提供了一次序列化和驗證多個物件的行為。你通常不需要直接使用 `ListSerializer`，而應該在例項化序列化類時簡單地傳遞 `many=True`。
+`ListSerializer` 類提供了一次序列化和驗證多個物件的行為。你通常不需要直接使用 `ListSerializer`，而應該在實例化序列化類時簡單地傳遞 `many=True`。
 
-當一個序列化類被例項化並且 `many = True` 被傳遞時，一個 `ListSerializer` 例項將被建立。序列化類成為父級 `ListSerializer` 的子級
+當一個序列化類被實例化並且 `many=True` 被傳遞時，一個 `ListSerializer` 實例將被建立。序列化類成為父級 `ListSerializer` 的子級
 
-以下引數也可以傳遞給 `ListSerializer` 欄位或傳遞了 `many = True` 的序列化類：
+以下引數也可以傳遞給 `ListSerializer` 欄位或傳遞了 `many=True` 的序列化類：
 
 ### `allow_empty`
 
@@ -889,14 +889,14 @@ class BookSerializer(serializers.Serializer):
 預設情況下，`ListSerializer` 類不支援多物件更新。這是因為插入和刪除預期的行為是不明確的。
 
 為了支援多物件更新，你需要重寫 update 方法。在編寫你的多物件更新程式碼時，一定要記住以下幾點：  
-* 如何確定應該為資料列表中的每個 item 更新哪個例項？
+* 如何確定應該為資料列表中的每個 item 更新哪個實例？
 * 插入應該如何處理？它們是無效的，還是建立新物件？
 * 應該如何處理刪除？它們是否暗示了物件刪除，或者刪除了一段關係？它們應該被忽略，還是無效？
 * 如何處理排序？改變兩個 item 的位置是否意味著狀態的改變或者被忽略？
 
 
 
-你需要為例項序列化類新增一個顯式 `id` 欄位。預設的隱式生成的 `id` 欄位被標記為 `read_only`。這會導致它在更新時被刪除。一旦你明確宣告它，它將在列表序列化類的更新方法中可用。
+你需要為實例序列化類新增一個顯式 `id` 欄位。預設的隱式生成的 `id` 欄位被標記為 `read_only`。這會導致它在更新時被刪除。一旦你明確宣告它，它將在列表序列化類的更新方法中可用。
 
 下面是你如何選擇實現多物件更新的示例：
 
@@ -936,12 +936,12 @@ class BookSerializer(serializers.Serializer):
 
 #### 自定義 ListSerializer 初始化
 
-當具有 `many=True`的序列化類例項化時，我們需要確定哪些引數和關鍵字引數應該傳遞給子級 `Serializer`類和父級 `ListSerializer` 類的 `.__ init __()` 方法。
+當具有 `many=True`的序列化類實例化時，我們需要確定哪些引數和關鍵字引數應該傳遞給子級 `Serializer`類和父級 `ListSerializer` 類的 `.__init__()` 方法。
 
 
 預設的實現是將所有引數傳遞給兩個類，除了 `validators` 和任何自定義關鍵字引數，這兩個引數都假定用於子序列化類。
 
-有時你可能需要明確指定在傳遞 `many=True` 時如何例項化子類和父類。您可以使用 `many_init` 類方法來完成此操作。
+有時你可能需要明確指定在傳遞 `many=True` 時如何實例化子類和父類。您可以使用 `many_init` 類方法來完成此操作。
 
 
 ``` python
@@ -963,12 +963,12 @@ class BookSerializer(serializers.Serializer):
 * `.is_valid()` - 反序列化並驗證傳入的資料。
 * `.validated_data` - 返回驗證的傳入資料。
 * `.errors` - 在驗證期間返回錯誤。
-* `.save()` - 將驗證的資料儲存到物件例項中。
+* `.save()` - 將驗證的資料儲存到物件實例中。
 
 有四種方法可以被覆蓋，這取決於你希望序列化類支援的功能：  
 * `.to_representation()` - 重寫此操作以支援序列化，用於讀取操作。
 * `.to_internal_value()` - 重寫此操作以支援反序列化，以用於寫入操作。
-* `.create() 和 .update()` - 覆蓋其中一個或兩個以支援儲存例項。
+* `.create() 和 .update()` - 覆蓋其中一個或兩個以支援儲存實例。
 
 因為這個類提供了與 `Serializer` 類相同的介面，所以你可以像現有的常規 `Serializer`或 `ModelSerializer` 一樣，將它與基於類的通用檢視一起使用。
 
@@ -986,7 +986,7 @@ class HighScore(models.Model):
     score = models.IntegerField()
 ```
 
-建立用於將 `HighScore` 例項轉換為基本資料型別的只讀序列化類非常簡單。
+建立用於將 `HighScore` 實例轉換為基本資料型別的只讀序列化類非常簡單。
 
 ``` python
 class HighScoreSerializer(serializers.BaseSerializer):
@@ -997,7 +997,7 @@ class HighScoreSerializer(serializers.BaseSerializer):
         }
 ```
 
-我們現在可以使用這個類來序列化單個 `HighScore` 例項：
+我們現在可以使用這個類來序列化單個 `HighScore` 實例：
 
 ``` python
 @api_view(['GET'])
@@ -1007,7 +1007,7 @@ def high_score(request, pk):
     return Response(serializer.data)
 ```
 
-或者用它來序列化多個例項：
+或者用它來序列化多個實例：
 
 ``` python
 @api_view(['GET'])
@@ -1019,7 +1019,7 @@ def all_high_scores(request):
 
 ### Read-write BaseSerializer 類
 
-要建立一個可讀寫的序列化類，我們首先需要實現一個 `.to_internal_value()` 方法。此方法返回將用於構造物件例項的驗證值，並且如果提供的資料格式不正確，則可能引發 `ValidationError` 。
+要建立一個可讀寫的序列化類，我們首先需要實現一個 `.to_internal_value()` 方法。此方法返回將用於構造物件實例的驗證值，並且如果提供的資料格式不正確，則可能引發 `ValidationError` 。
 
 一旦實現 `.to_internal_value()`，基本驗證 API 將在序列化器中可用，並且你將能夠使用 `.is_valid()`，`.validated_data` 和 `.errors`。
 
@@ -1124,7 +1124,7 @@ class ObjectSerializer(serializers.BaseSerializer):
 
 **`.to_representation(self, obj)`**
 
-接受需要序列化的物件例項，並返回一個原始表示。通常這意味著返回一個內建 Python 資料型別的結構。可以處理的確切型別取決於您為 API 配置的渲染類。
+接受需要序列化的物件實例，並返回一個原始表示。通常這意味著返回一個內建 Python 資料型別的結構。可以處理的確切型別取決於您為 API 配置的渲染類。
 
 可能會被重寫以便修改表示風格。例如：
 

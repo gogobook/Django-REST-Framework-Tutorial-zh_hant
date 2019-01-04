@@ -42,11 +42,11 @@ this.$http({
 
     Django 提供的 CSRF 防護機制
 
-    django 第一次響應來自某個客户端的請求時，會在服務器端隨機生成一個 token，把這個 token 放在 cookie 裏。然後每次 POST 請求都會帶上這個 token，
+    django 第一次response 來自某個客户端的請求時，會在服務器端隨機生成一個 token，把這個 token 放在 cookie 裏。然後每次 POST 請求都會帶上這個 token，
 
     這樣就能避免被 CSRF 攻擊。
 
-        在返回的 HTTP 響應的 cookie 裏，django 會為你添加一個 csrftoken 字段，其值為一個自動生成的 token
+        在返回的 HTTP response 的 cookie 裏，django 會為你添加一個 csrftoken 字段，其值為一個自動生成的 token
         在所有的 POST 表單時，必須包含一個 csrfmiddlewaretoken 字段 （只需要在模板里加一個 tag， django 就會自動幫你生成，見下面）
         在處理 POST 請求之前，django 會驗證這個請求的 cookie 裏的 csrftoken 字段的值和提交的表單裏的 csrfmiddlewaretoken 字段的值是否一樣。如果一樣，則表明這是一個合法的請求，否則，這個請求可能是來自於別人的 csrf 攻擊，返回 403 Forbidden.
         在所有 ajax POST 請求裏，添加一個 X-CSRFTOKEN header，其值為 cookie 裏的 csrftoken 的值。
@@ -80,5 +80,5 @@ function getCookie(name) {
 
 Vue.http.headers.common['X-CSRFToken'] = getCookie('csrftoken');            
 ```
-之後HTTP請求頭上的X-CSRFToken就有值了，響應也就成功了。
+之後HTTP請求頭上的X-CSRFToken就有值了，response 也就成功了。
 

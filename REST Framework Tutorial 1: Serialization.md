@@ -1,14 +1,15 @@
 # Tutorial 1: 序列化 Serialization
 
-`新的教學好像改了很多東西，201606更新` 
-`201701更新` 
-`201801更新` 
+`新的教學好像改了很多東西，201606更新`  
+`201701更新`  
+`201801更新`  
 ## 0. 介紹
 這個教學將包合建立一個簡單的pastebin 程式碼高亮 web api. 以此介紹REST framework所修飾的各種component, 並且讓你對所有的元件如何整合在一起有一個完整的了解。
 
 這個教學是非常深入的，所以你在開始前，可能要準備一些點心和一杯咖啡，假如你只是想要簡單看過，你應該去看quickstart
 <hr>
-**注意：**這個教學的程式碼可以在github 的tomchristie/rest-framework-tutorial 上找到，網路上也有完整的實作的砂盒版本。
+
+**注意：** 這個教學的程式碼可以在github 的tomchristie/rest-framework-tutorial 上找到，網路上也有完整的實作的砂盒版本。
 
 ## 1. 設置一個新的環境
 
@@ -171,7 +172,7 @@
     # type(content)
     # bytes
 
-反序列化也很簡單，首先我們要將一個輸入流（content），轉換成python的原生數據類型
+反序列化也很簡單，首先我們要將一個輸入流（content），轉換成python的原生數據類型  
 `這裡可能可以做一些修改，使用json.loads(content.decode())，可返回python 的dict資料類型`
 
     from django.utils.six import BytesIO

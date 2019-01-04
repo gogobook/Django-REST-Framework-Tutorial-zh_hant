@@ -8,11 +8,11 @@
 ## 如何確定權限
 REST framework 中的權限總是被定義為權限類的列表。
 在運行視圖的主體之前，檢查列表中的每個權限。如果任何權限檢查失敗，則會引發 exceptions.PermissionDenied 或 exceptions.NotAuthenticated 異常，並且視圖的主體不會再運行。
-當權限檢查失敗時，根據以下規則，將返回 「403 Forbidden」 或 「401 Unauthorized」 響應：
+當權限檢查失敗時，根據以下規則，將返回 「403 Forbidden」 或 「401 Unauthorized」 response ：
 
-該請求已成功通過身份驗證，但權限被拒絕。 — 將返回 403 Forbidden 響應。
-該請求未成功通過身份驗證，並且最高優先級身份驗證類未添加 WWW-Authenticate header。— 將返回 403 Forbidden 響應。
-該請求未成功通過身份驗證，不過最高優先級身份驗證類添加了 WWW-Authenticate header。— 返回一個 HTTP 401 Unauthorized 響應，並會帶上一個適當的 WWW-Authenticate header。
+該請求已成功通過身份驗證，但權限被拒絕。 — 將返回 403 Forbidden response 。
+該請求未成功通過身份驗證，並且最高優先級身份驗證類未添加 WWW-Authenticate header。— 將返回 403 Forbidden response 。
+該請求未成功通過身份驗證，不過最高優先級身份驗證類添加了 WWW-Authenticate header。— 返回一個 HTTP 401 Unauthorized response ，並會帶上一個適當的 WWW-Authenticate header。
 
 ## 對象級權限
 REST framework 權限還支持對象級權限。對象級權限用於確定是否允許用戶對特定對象進行操作，該特定對象通常是指模型實例。

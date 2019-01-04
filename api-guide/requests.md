@@ -25,9 +25,9 @@ request.query_params是一個更正確命名的同義詞request.GET。
 
 您通常不需要訪問此屬性。
 
-注意：如果客戶端發送格式錯誤的內容，則訪問request.data可能會引發ParseError。默認情況下，REST framework的APIView類或@api_view裝飾器將捕獲錯誤並返迴400 Bad Request響應。
+注意：如果客戶端發送格式錯誤的內容，則訪問request.data可能會引發ParseError。默認情況下，REST framework的APIView類或@api_view裝飾器將捕獲錯誤並返迴400 Bad Requestresponse 。
 
-如果客戶端發送的請求具有無法解析的內容類型，UnsupportedMediaType則會引發異常，默認情況下將捕獲該異常並返迴415 Unsupported Media Type響應。
+如果客戶端發送的請求具有無法解析的內容類型，UnsupportedMediaType則會引發異常，默認情況下將捕獲該異常並返迴415 Unsupported Media Typeresponse 。
 
 ## 內容協商
 該請求公開了一些允許您確定內容協商階段結果的屬性。這允許您實現行為，例如為不同的媒體類型選擇不同的序列化方案。

@@ -14,6 +14,6 @@ $.ajaxSetup({
 ```
 X-XSRF-TOKEN
 
-Laravel 將當前的 CSRF 令牌存儲在由框架生成的每個響應中包含的一個XSRF-TOKEN cookie 中。你可以使用該令牌的值來設置 X-XSRF-TOKEN 請求頭信息。
+Laravel 將當前的 CSRF 令牌存儲在由框架生成的每個response 中包含的一個XSRF-TOKEN cookie 中。你可以使用該令牌的值來設置 X-XSRF-TOKEN 請求頭信息。
 
 這個 cookie 作為頭信息發送主要是為了方便，因為一些 JavaScript 框架，如 Angular，會自動將其值添加到 X-XSRF-TOKEN 頭中.

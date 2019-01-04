@@ -64,7 +64,7 @@ def example_view(request, format=None):
     * HTTP 401 Unauthorized
     * HTTP 403 Permission Denied
 
-HTTP 401響應必須始終包含一個WWW-Authenticate標頭，指示客戶端如何進行身份驗證。HTTP 403響應不包括WWW-Authenticate標頭。
+HTTP 401response 必須始終包含一個WWW-Authenticate標頭，指示客戶端如何進行身份驗證。HTTP 403response 不包括WWW-Authenticate標頭。
 
 The kind of response that will be used depends on the authentication scheme. Although multiple authentication schemes may be in use, only one scheme may be used to determine the type of response. **The first authentication class set on the view is used when determining the type of response.**
 
