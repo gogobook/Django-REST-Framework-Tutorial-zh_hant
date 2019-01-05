@@ -169,7 +169,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(recent_users, many=True)
         return Response(serializer.data)
 ```
-The decorator can additionally take extra arguments that will be set for the routed view only. For example:
+The decorator can additionally take extra arguments that will be set for the routed view only. For example:  
 裝飾器可取得額外的參數，這僅可被routed view 所設定。例如
 ```py
     @action(methods=['post'], detail=True, permission_classes=[IsAdminOrIsSelf])
@@ -177,6 +177,7 @@ The decorator can additionally take extra arguments that will be set for the rou
        ...
 ```
 These decorator will route GET requests by default, but may also accept other HTTP methods by setting the methods argument. For example:
+
 ```py
     @action(methods=['post', 'delete'], detail=True)
     def unset_password(self, request, pk=None):

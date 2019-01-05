@@ -32,15 +32,15 @@ REST framework增加了對Django的自動URL路由的支持，並為您提供了
 * URL pattern: `^accounts/$`  Name: `'account-list'`
 * URL pattern: `^accounts/{pk}/$`  Name: `'account-detail'`
 
-**注意**：該`base_name`參數用於指定視圖名稱模式的初始部分。在上面的例子中，這是user或account部分。
+**注意**：該`base_name`參數用於指定視圖名稱模式(Name:)的初始部分。在上面的例子中，這是`user-list`或`user-detail`中user 的部分或`account-list`或`account-detail`中account 部分。
 
 通常，您**不需要**指定`base_name`參數，但如果您有一個已定義自定義`get_queryset`方法的視圖集，則視圖集可能沒有設置`.queryset`屬性。如果您嘗試註冊該視圖集，您將看到如下錯誤：
 
-    'base_name' argument not specified, and could not automatically determine the name from the viewset, as it does not have a '.queryset' attribute.
+'base_name' argument not specified, and could not automatically determine the name from the viewset, as it does not have a '.queryset' attribute.
 這意味著您需要`base_name`在註冊視圖集時顯式設置參數，因為它無法從模型名稱自動確定。
 
 ### 使用include路由器
-.urls路由器實例上的屬性只是URL模式的標準列表。有關如何包含這些URL的方式有很多種。
+.urls路由器實例上的屬性只是URL模式的標準列表。有關如何包含(include)這些URL的方式有很多種。
 
 例如，您可以附加router.urls到現有視圖列表中......
 ```py
@@ -52,7 +52,7 @@ REST framework增加了對Django的自動URL路由的支持，並為您提供了
         url(r'^forgot-password/$', ForgotPasswordFormView.as_view()),
     ]
 
-    urlpatterns += router.urls
+    urlpatterns += router.urls # 直接使用+= router.url
 ```
 或者你也可以使用Django的include功能......
 ```py
@@ -82,7 +82,7 @@ REST framework增加了對Django的自動URL路由的支持，並為您提供了
 自動view_name生成使用類似的模式%(model_name)-detail。除非您的模型名稱實際發生衝突，否則在使用超鏈接序列化程序時，最好不要命名Django REST Framework視圖。
 
 ### 額外的action 的路由
-視圖集可以通過使用裝飾器裝飾方法來標記用於路由的額外動作@action。這些額外的操作將包含在生成的路由中。例如，給定類set_password上的方法UserViewSet：
+視圖集可以通過使用@action 裝飾器裝飾方法來標記用於路由的額外動作。這些額外的操作將包含在生成的路由中。例如，用在`UserViewSet`類的方法`set_password`：
 ```py
     from myapp.permissions import IsAdminOrIsSelf
     from rest_framework.decorators import action
@@ -99,9 +99,9 @@ REST framework增加了對Django的自動URL路由的支持，並為您提供了
 * URL pattern: `^users/{pk}/set_password/$`
 * URL name: `'user-set-password'`
 
-默認情況下，URL模式基於方法名稱，URL名稱是ViewSet.base_name連字符和方法名稱的組合。如果您不想對這些值中的任何一個使用默認值，則可以為裝飾器提供url_path和url_name參數@action。
+默認情況下，URL模式是基於方法名稱的，URL名稱是`ViewSet.base_name` 加連字符和方法名稱的組合。如果您不想對這些值中的任何一個使用默認值，則可以為`@action` 裝飾器提供`url_path` 和`url_name` 參數。
 
-例如，如果要將自定義操作的URL更改為^users/{pk}/change-password/$，則可以編寫：
+例如，如果要將自定義action 的URL更改為`^users/{pk}/change-password/$`，則可以編寫：
 ```py
     from myapp.permissions import IsAdminOrIsSelf
     from rest_framework.decorators import action
